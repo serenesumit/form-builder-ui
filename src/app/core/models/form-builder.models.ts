@@ -1,11 +1,15 @@
 // Core Models for Form Builder API
 
 export interface SaveFormRequest {
+  definitionId?: string;
   code: string;
   name: string;
   description?: string;
   category?: string;
   isStandard: boolean;
+  isActive?: boolean;
+  allowVersioning?: boolean;
+  changeNotes?: string;
   sections: FormBuilderSectionRequest[];
 }
 
@@ -75,6 +79,20 @@ export interface FormBuilderConditionalRuleRequest {
 export interface SaveFormResult {
   definitionId: string;
   versionId: string;
+}
+
+export interface FormListItemDto {
+  definitionId: string;
+  currentVersionId?: string;
+  code: string;
+  name: string;
+  description?: string;
+  category?: string;
+  isActive: boolean;
+  isStandard: boolean;
+  createdDate: string;
+  modifiedDate: string;
+  versionCount: number;
 }
 
 export interface FormBuilderDto {

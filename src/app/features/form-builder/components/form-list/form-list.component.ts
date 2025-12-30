@@ -2,13 +2,15 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GridModule, PageSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { timeout, catchError, of, finalize } from 'rxjs';
 import { FormBuilderApiService } from '@core/services/form-builder-api.service';
-import { FormBuilderDto } from '@core/models/form-builder.models';
+import { FormListItemDto } from '@core/models/form-builder.models';
 
 @Component({
   selector: 'app-form-list',
   standalone: true,
-  imports: [CommonModule, GridModule],
+  imports: [CommonModule, GridModule, ButtonModule],
   templateUrl: './form-list.component.html',
   styleUrls: ['./form-list.component.scss']
 })
@@ -17,7 +19,7 @@ export class FormListComponent implements OnInit {
   private readonly apiService = inject(FormBuilderApiService);
 
   // Signals
-  readonly forms = signal<FormBuilderDto[]>([]);
+  readonly forms = signal<FormListItemDto[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
 
@@ -26,9 +28,6 @@ export class FormListComponent implements OnInit {
   toolbar: ToolbarItems[] = ['Search'];
 
   ngOnInit(): void {
-    // Note: The API doesn't have a "list all forms" endpoint in the documentation
-    // This would typically be added to the API, or forms would be loaded differently
-    // For now, this is a placeholder for when that endpoint is available
     this.loadForms();
   }
 
@@ -36,12 +35,21 @@ export class FormListComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    // Placeholder - would call apiService.getAllForms() when available
-    // For demo purposes, setting empty array
-    setTimeout(() => {
-      this.forms.set([]);
-      this.isLoading.set(false);
-    }, 500);
+    this.apiService.getAllForms().pipe(
+      timeout(10000), // 10 second timeout
+      catchError((error) => {
+        const errorMessage = error.name === 'TimeoutError'
+          ? 'Request timed out. Please check if the API server is running.'
+          : error.message || 'Failed to load forms';
+        this.error.set(errorMessage);
+        return of([]);
+      }),
+      finalize(() => this.isLoading.set(false)) // Always stop loading
+    ).subscribe({
+      next: (forms) => {
+        this.forms.set(forms);
+      }
+    });
   }
 
   onCreateNew(): void {

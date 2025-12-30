@@ -53,6 +53,9 @@ export class FormBuilderService {
       description: '',
       category: '',
       isStandard: false,
+      isActive: true,
+      allowVersioning: true,
+      changeNotes: '',
       sections: []
     };
 
@@ -357,11 +360,15 @@ export class FormBuilderService {
     // you would need to fetch the full form structure with sections
     // For now, returning a basic structure
     return {
+      definitionId: dto.definitionId,
       code: dto.code,
       name: dto.name,
       description: dto.description,
       category: dto.category,
       isStandard: dto.isStandard,
+      isActive: true,
+      allowVersioning: true,
+      changeNotes: '',
       sections: [] // Would need additional API call to get full section details
     };
   }

@@ -1,11 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '@environments/environment';
 import {
   SaveFormRequest,
   SaveFormResult,
   FormBuilderDto,
+  FormListItemDto,
   ApiError
 } from '../models/form-builder.models';
 
@@ -15,6 +16,15 @@ import {
 export class FormBuilderApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/tenants/${environment.tenantId}/form-builder`;
+
+  /**
+   * Retrieves all forms for the tenant
+   */
+  getAllForms(includeInactive: boolean = false): Observable<FormListItemDto[]> {
+    const params = new HttpParams().set('includeInactive', includeInactive.toString());
+    return this.http.get<FormListItemDto[]>(this.baseUrl, { params })
+      .pipe(catchError(this.handleError));
+  }
 
   /**
    * Creates a new questionnaire form

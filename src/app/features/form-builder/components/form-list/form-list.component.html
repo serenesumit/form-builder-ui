@@ -33,14 +33,22 @@
       <e-columns>
         <e-column field="code" headerText="Code" width="120"></e-column>
         <e-column field="name" headerText="Name" width="200"></e-column>
-        <e-column field="description" headerText="Description" width="250"></e-column>
-        <e-column field="category" headerText="Category" width="120"></e-column>
+        <e-column field="description" headerText="Description" width="200"></e-column>
+        <e-column field="category" headerText="Category" width="100"></e-column>
+        <e-column
+          field="isActive"
+          headerText="Active"
+          width="80"
+          [displayAsCheckBox]="true">
+        </e-column>
         <e-column
           field="isStandard"
           headerText="Standard"
-          width="100"
+          width="80"
           [displayAsCheckBox]="true">
         </e-column>
+        <e-column field="versionCount" headerText="Versions" width="80"></e-column>
+        <e-column field="modifiedDate" headerText="Modified" width="120" type="date" format="yMd"></e-column>
         <e-column
           headerText="Actions"
           width="150"
@@ -52,19 +60,22 @@
                 ejs-button
                 (click)="onView(data.definitionId)"
                 cssClass="e-small e-info"
-                iconCss="e-icons e-eye">
+                iconCss="e-icons e-eye"
+                title="View">
               </button>
               <button
                 ejs-button
                 (click)="onEdit(data.definitionId)"
                 cssClass="e-small e-success"
-                iconCss="e-icons e-edit">
+                iconCss="e-icons e-edit"
+                title="Edit">
               </button>
               <button
                 ejs-button
                 (click)="onDelete(data.definitionId)"
                 cssClass="e-small e-danger"
-                iconCss="e-icons e-delete">
+                iconCss="e-icons e-delete"
+                title="Delete">
               </button>
             </div>
           </ng-template>
