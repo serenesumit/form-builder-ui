@@ -1,0 +1,425 @@
+<div class="properties-panel">
+  @if (!showQuestionProps() && !showSectionProps()) {
+    <!-- No Selection -->
+    <div class="no-selection">
+      <div class="no-selection-icon">
+        <span class="material-icons">touch_app</span>
+      </div>
+      <h4>No Selection</h4>
+      <p>Select a question or section to edit its properties</p>
+    </div>
+  } @else if (showSectionProps()) {
+    <!-- Section Properties -->
+    <div class="panel-header">
+      <div class="panel-title">
+        <span class="type-icon material-icons">folder_open</span>
+        <div class="title-text">
+          <h3>Section Properties</h3>
+          <span class="subtitle">Configure section settings</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-content">
+      <div class="form-group">
+        <label for="sectionName">Section Name</label>
+        <input 
+          type="text" 
+          id="sectionName"
+          [(ngModel)]="sectionName"
+          (ngModelChange)="onSectionNameChange()"
+          placeholder="Enter section name">
+      </div>
+
+      <div class="form-group">
+        <label for="sectionDesc">Description</label>
+        <textarea 
+          id="sectionDesc"
+          [(ngModel)]="sectionDescription"
+          (ngModelChange)="onSectionDescriptionChange()"
+          placeholder="Optional description"
+          rows="3"></textarea>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="toggle-group">
+        <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="isCollapsible"
+            (ngModelChange)="onCollapsibleChange()">
+          <span class="toggle-text">
+            <span class="toggle-title">Collapsible</span>
+            <span class="toggle-desc">Allow users to collapse this section</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="toggle-group">
+        <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="progressIndicator"
+            (ngModelChange)="onProgressIndicatorChange()">
+          <span class="toggle-text">
+            <span class="toggle-title">Progress Indicator</span>
+            <span class="toggle-desc">Show in form progress</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="toggle-group">
+        <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="isRepeatable"
+            (ngModelChange)="onRepeatableChange()">
+          <span class="toggle-text">
+            <span class="toggle-title">Repeatable</span>
+            <span class="toggle-desc">Allow multiple instances</span>
+          </span>
+        </label>
+      </div>
+
+      @if (isRepeatable) {
+        <div class="inline-fields">
+          <div class="form-group">
+            <label for="minRepeat">Min Repeat</label>
+            <input 
+              type="number" 
+              id="minRepeat"
+              [(ngModel)]="minRepeat"
+              (ngModelChange)="onMinRepeatChange()"
+              min="1">
+          </div>
+          <div class="form-group">
+            <label for="maxRepeat">Max Repeat</label>
+            <input 
+              type="number" 
+              id="maxRepeat"
+              [(ngModel)]="maxRepeat"
+              (ngModelChange)="onMaxRepeatChange()"
+              min="1"
+              placeholder="No limit">
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- Question Properties -->
+    <div class="panel-header">
+      <div class="panel-title">
+        <span class="type-icon material-icons">{{ questionTypeIcon() }}</span>
+        <div class="title-text">
+          <h3>{{ questionTypeName() }}</h3>
+          <span class="subtitle">Edit question properties</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-tabs">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'general'"
+        (click)="setTab('general')"
+        type="button">
+        General
+      </button>
+      @if (hasOptions()) {
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'options'"
+          (click)="setTab('options')"
+          type="button">
+          Options
+        </button>
+      }
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'validation'"
+        (click)="setTab('validation')"
+        type="button">
+        Validation
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'advanced'"
+        (click)="setTab('advanced')"
+        type="button">
+        Advanced
+      </button>
+    </div>
+
+    <div class="panel-content">
+      <!-- General Tab -->
+      @if (activeTab === 'general') {
+        <div class="form-group">
+          <label for="questionText">Question Text <span class="required">*</span></label>
+          <textarea 
+            id="questionText"
+            [(ngModel)]="questionText"
+            (ngModelChange)="onQuestionTextChange()"
+            placeholder="Enter your question"
+            rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="questionCode">Question Code</label>
+          <input 
+            type="text" 
+            id="questionCode"
+            [(ngModel)]="questionCode"
+            (ngModelChange)="onQuestionCodeChange()"
+            placeholder="e.g., Q1, PHQ9_1">
+          <span class="field-hint">Unique identifier for this question</span>
+        </div>
+
+        <div class="form-group">
+          <label for="helpText">Help Text</label>
+          <textarea 
+            id="helpText"
+            [(ngModel)]="helpText"
+            (ngModelChange)="onHelpTextChange()"
+            placeholder="Additional instructions for respondents"
+            rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="placeholder">Placeholder</label>
+          <input 
+            type="text" 
+            id="placeholder"
+            [(ngModel)]="placeholderText"
+            (ngModelChange)="onPlaceholderTextChange()"
+            placeholder="Placeholder text...">
+        </div>
+
+        <div class="form-group">
+          <label for="defaultValue">Default Value</label>
+          <input 
+            type="text" 
+            id="defaultValue"
+            [(ngModel)]="defaultValue"
+            (ngModelChange)="onDefaultValueChange()"
+            placeholder="Default answer">
+        </div>
+
+        <div class="form-divider"></div>
+
+        <div class="toggle-group">
+          <label class="toggle-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="isRequired"
+              (ngModelChange)="onRequiredChange()">
+            <span class="toggle-text">
+              <span class="toggle-title">Required</span>
+              <span class="toggle-desc">Respondent must answer this question</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="toggle-group">
+          <label class="toggle-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="isPhi"
+              (ngModelChange)="onPhiChange()">
+            <span class="toggle-text">
+              <span class="toggle-title">Protected Health Info (PHI)</span>
+              <span class="toggle-desc">Contains sensitive health data</span>
+            </span>
+          </label>
+        </div>
+      }
+
+      <!-- Options Tab -->
+      @if (activeTab === 'options' && hasOptions()) {
+        <div class="options-section">
+          <div class="options-header">
+            <h4>Answer Options</h4>
+            <button class="add-option-btn" (click)="addOption()" type="button">
+              <span class="material-icons">add</span>
+              Add Option
+            </button>
+          </div>
+
+          @if (options.length === 0) {
+            <div class="empty-options">
+              <p>No options added yet. Click "Add Option" to create choices.</p>
+            </div>
+          } @else {
+            <div class="options-list">
+              @for (option of options; track option.id; let i = $index) {
+                <div class="option-item">
+                  <span class="option-handle material-icons">drag_indicator</span>
+                  <div class="option-fields">
+                    <input 
+                      type="text" 
+                      [value]="option.text"
+                      (input)="updateOption(i, 'text', $any($event.target).value)"
+                      placeholder="Option text">
+                    <input 
+                      type="text" 
+                      [value]="option.value"
+                      (input)="updateOption(i, 'value', $any($event.target).value)"
+                      placeholder="Value"
+                      class="value-input">
+                    <input 
+                      type="number" 
+                      [value]="option.numericScore"
+                      (input)="updateOption(i, 'numericScore', $any($event.target).valueAsNumber)"
+                      placeholder="Score"
+                      class="score-input">
+                  </div>
+                  <button 
+                    class="remove-option-btn" 
+                    (click)="removeOption(i)"
+                    type="button">
+                    <span class="material-icons">close</span>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Validation Tab -->
+      @if (activeTab === 'validation') {
+        <div class="inline-fields">
+          <div class="form-group">
+            <label for="minValue">Min Value</label>
+            <input 
+              type="number" 
+              id="minValue"
+              [(ngModel)]="minValue"
+              (ngModelChange)="onMinValueChange()"
+              placeholder="No min">
+          </div>
+          <div class="form-group">
+            <label for="maxValue">Max Value</label>
+            <input 
+              type="number" 
+              id="maxValue"
+              [(ngModel)]="maxValue"
+              (ngModelChange)="onMaxValueChange()"
+              placeholder="No max">
+          </div>
+        </div>
+
+        <div class="inline-fields">
+          <div class="form-group">
+            <label for="minLength">Min Length</label>
+            <input 
+              type="number" 
+              id="minLength"
+              [(ngModel)]="minLength"
+              (ngModelChange)="onMinLengthChange()"
+              placeholder="No min">
+          </div>
+          <div class="form-group">
+            <label for="maxLength">Max Length</label>
+            <input 
+              type="number" 
+              id="maxLength"
+              [(ngModel)]="maxLength"
+              (ngModelChange)="onMaxLengthChange()"
+              placeholder="No max">
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <div class="form-group">
+          <label for="regexPattern">Regex Pattern</label>
+          <input 
+            type="text" 
+            id="regexPattern"
+            [(ngModel)]="regexPattern"
+            (ngModelChange)="onRegexPatternChange()"
+            placeholder="e.g., ^[A-Za-z]+$">
+          <span class="field-hint">Regular expression for custom validation</span>
+        </div>
+
+        <div class="form-group">
+          <label for="regexError">Regex Error Message</label>
+          <input 
+            type="text" 
+            id="regexError"
+            [(ngModel)]="regexErrorMessage"
+            (ngModelChange)="onRegexErrorMessageChange()"
+            placeholder="Error message for invalid input">
+        </div>
+      }
+
+      <!-- Advanced Tab -->
+      @if (activeTab === 'advanced') {
+        <div class="form-group">
+          <label>Medical Codes</label>
+          <span class="field-hint">Standard coding for interoperability</span>
+        </div>
+
+        <div class="form-group">
+          <label for="cptCode">CPT Code</label>
+          <input 
+            type="text" 
+            id="cptCode"
+            [value]="selectedQuestion()?.cptCode || ''"
+            (input)="updateQuestionField('cptCode', $any($event.target).value)"
+            placeholder="e.g., 99213">
+        </div>
+
+        <div class="form-group">
+          <label for="loincCode">LOINC Code</label>
+          <input 
+            type="text" 
+            id="loincCode"
+            [value]="selectedQuestion()?.loincCode || ''"
+            (input)="updateQuestionField('loincCode', $any($event.target).value)"
+            placeholder="e.g., 44249-1">
+        </div>
+
+        <div class="form-group">
+          <label for="snomedCode">SNOMED Code</label>
+          <input 
+            type="text" 
+            id="snomedCode"
+            [value]="selectedQuestion()?.snomedCode || ''"
+            (input)="updateQuestionField('snomedCode', $any($event.target).value)"
+            placeholder="e.g., 386661006">
+        </div>
+
+        <div class="form-divider"></div>
+
+        <div class="toggle-group">
+          <label class="toggle-label">
+            <input 
+              type="checkbox" 
+              [checked]="selectedQuestion()?.isCalculated || false"
+              (change)="updateQuestionField('isCalculated', $any($event.target).checked)">
+            <span class="toggle-text">
+              <span class="toggle-title">Calculated Field</span>
+              <span class="toggle-desc">Value computed from other fields</span>
+            </span>
+          </label>
+        </div>
+
+        @if (selectedQuestion()?.isCalculated) {
+          <div class="form-group">
+            <label for="formula">Calculation Formula</label>
+            <textarea 
+              id="formula"
+              [value]="selectedQuestion()?.calculationFormula || ''"
+              (input)="updateQuestionField('calculationFormula', $any($event.target).value)"
+              placeholder="e.g., Q1 + Q2 + Q3"
+              rows="3"></textarea>
+            <span class="field-hint">Reference other questions by their code</span>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+

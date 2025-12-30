@@ -1,0 +1,202 @@
+<div class="form-renderer">
+  <div class="form-header">
+    <h2>{{ formDefinition.name }}</h2>
+    @if (formDefinition.description) {
+      <p class="form-description">{{ formDefinition.description }}</p>
+    }
+    @if (formDefinition.category) {
+      <span class="form-category">{{ formDefinition.category }}</span>
+    }
+  </div>
+
+  <div class="form-body">
+    @for (section of formDefinition.sections; track $index) {
+      <div class="form-section" [class.collapsible]="section.isCollapsible">
+        <div class="section-header">
+          <h3>{{ section.sectionName }}</h3>
+          @if (section.sectionDescription) {
+            <p class="section-description">{{ section.sectionDescription }}</p>
+          }
+        </div>
+
+        <div class="section-questions">
+          @for (question of section.questions; track $index) {
+            @if (question.isActive) {
+              <div class="question-container"
+                   [style.background-color]="question.backgroundColor || 'transparent'"
+                   [style.border-color]="question.borderColor || '#e0e0e0'"
+                   [style.height.px]="question.height">
+
+                <div class="question-label">
+                  <label [attr.for]="getQuestionId($index, $index)">
+                    {{ question.questionText }}
+                    @if (question.isRequired) {
+                      <span class="required-indicator">*</span>
+                    }
+                  </label>
+                  @if (question.helpText) {
+                    <p class="help-text">{{ question.helpText }}</p>
+                  }
+                </div>
+
+                <div class="question-input">
+                  <!-- Text Input -->
+                  @if (question.questionTypeId === QuestionType.Text) {
+                    <ejs-textbox
+                      [id]="getQuestionId($index, $index)"
+                      [placeholder]="question.placeholderText || ''"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
+                      floatLabelType="Never">
+                    </ejs-textbox>
+                  }
+
+                  <!-- TextArea -->
+                  @if (question.questionTypeId === QuestionType.TextArea) {
+                    <ejs-textbox
+                      [id]="getQuestionId($index, $index)"
+                      [placeholder]="question.placeholderText || ''"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
+                      [multiline]="true"
+                      floatLabelType="Never">
+                    </ejs-textbox>
+                  }
+
+                  <!-- Radio Button -->
+                  @if (question.questionTypeId === QuestionType.Radio) {
+                    <div class="radio-group">
+                      @for (option of question.options; track $index) {
+                        <ejs-radiobutton
+                          [label]="option.optionText"
+                          [name]="getQuestionId($index, $index)"
+                          [value]="option.optionValue || option.optionText"
+                          [checked]="getQuestionValue(getQuestionId($index, $index)) === (option.optionValue || option.optionText)"
+                          (change)="setQuestionValue(getQuestionId($index, $index), option.optionValue || option.optionText)">
+                        </ejs-radiobutton>
+                      }
+                    </div>
+                  }
+
+                  <!-- Checkbox -->
+                  @if (question.questionTypeId === QuestionType.Checkbox) {
+                    <div class="checkbox-group">
+                      @for (option of question.options; track $index) {
+                        <ejs-checkbox
+                          [label]="option.optionText"
+                          [value]="option.optionValue || option.optionText">
+                        </ejs-checkbox>
+                      }
+                    </div>
+                  }
+
+                  <!-- Date -->
+                  @if (question.questionTypeId === QuestionType.Date) {
+                    <ejs-datepicker
+                      [id]="getQuestionId($index, $index)"
+                      [placeholder]="question.placeholderText || 'Select date'"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (change)="setQuestionValue(getQuestionId($index, $index), $event.value)"
+                      floatLabelType="Never">
+                    </ejs-datepicker>
+                  }
+
+                  <!-- Time -->
+                  @if (question.questionTypeId === QuestionType.Time) {
+                    <ejs-timepicker
+                      [id]="getQuestionId($index, $index)"
+                      [placeholder]="question.placeholderText || 'Select time'"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (change)="setQuestionValue(getQuestionId($index, $index), $event.value)"
+                      floatLabelType="Never">
+                    </ejs-timepicker>
+                  }
+
+                  <!-- DateTime -->
+                  @if (question.questionTypeId === QuestionType.DateTime) {
+                    <ejs-datetimepicker
+                      [id]="getQuestionId($index, $index)"
+                      [placeholder]="question.placeholderText || 'Select date and time'"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (change)="setQuestionValue(getQuestionId($index, $index), $event.value)"
+                      floatLabelType="Never">
+                    </ejs-datetimepicker>
+                  }
+
+                  <!-- Number -->
+                  @if (question.questionTypeId === QuestionType.Number) {
+                    <ejs-numerictextbox
+                      [id]="getQuestionId($index, $index)"
+                      [placeholder]="question.placeholderText || ''"
+                      [min]="question.minValue ?? undefined"
+                      [max]="question.maxValue ?? undefined"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (change)="setQuestionValue(getQuestionId($index, $index), $event.value)"
+                      floatLabelType="Never">
+                    </ejs-numerictextbox>
+                  }
+
+                  <!-- Email -->
+                  @if (question.questionTypeId === QuestionType.Email) {
+                    <ejs-textbox
+                      [id]="getQuestionId($index, $index)"
+                      type="email"
+                      [placeholder]="question.placeholderText || 'Enter email'"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
+                      floatLabelType="Never">
+                    </ejs-textbox>
+                  }
+
+                  <!-- Phone -->
+                  @if (question.questionTypeId === QuestionType.Phone) {
+                    <ejs-textbox
+                      [id]="getQuestionId($index, $index)"
+                      type="tel"
+                      [placeholder]="question.placeholderText || 'Enter phone number'"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
+                      floatLabelType="Never">
+                    </ejs-textbox>
+                  }
+
+                  <!-- Dropdown -->
+                  @if (question.questionTypeId === QuestionType.Dropdown) {
+                    <ejs-dropdownlist
+                      [id]="getQuestionId($index, $index)"
+                      [dataSource]="question.options"
+                      [fields]="getDropdownFields()"
+                      [placeholder]="question.placeholderText || 'Select an option'"
+                      [value]="getQuestionValue(getQuestionId($index, $index))"
+                      (change)="setQuestionValue(getQuestionId($index, $index), $event.value)"
+                      floatLabelType="Never">
+                    </ejs-dropdownlist>
+                  }
+
+                  <!-- Slider -->
+                  @if (question.questionTypeId === QuestionType.Slider) {
+                    <input
+                      type="range"
+                      [id]="getQuestionId($index, $index)"
+                      [min]="question.minValue ?? 0"
+                      [max]="question.maxValue ?? 100"
+                      [value]="getQuestionValue(getQuestionId($index, $index)) ?? question.defaultValue ?? 0"
+                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
+                      class="slider">
+                    <span class="slider-value">{{ getQuestionValue(getQuestionId($index, $index)) ?? question.defaultValue ?? 0 }}</span>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="form-footer">
+    <button ejs-button (click)="onSubmit()" cssClass="e-primary e-large">
+      Submit
+    </button>
+  </div>
+</div>

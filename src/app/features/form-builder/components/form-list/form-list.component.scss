@@ -1,0 +1,119 @@
+.form-list-container {
+  padding: 24px 32px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+      letter-spacing: -0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      
+      button {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 20px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+        }
+      }
+    }
+  }
+
+  .error-message {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    p {
+      margin: 0;
+      color: #dc2626;
+      font-weight: 500;
+    }
+  }
+
+  .loading {
+    text-align: center;
+    padding: 60px;
+    color: #64748b;
+    font-size: 15px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    
+    button {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+// Grid styling overrides
+:host ::ng-deep {
+  .e-grid {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    
+    .e-gridheader {
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+    
+    .e-headercell {
+      font-weight: 600;
+      color: #475569;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .e-rowcell {
+      color: #1e293b;
+      padding: 14px 12px;
+    }
+    
+    .e-row:hover {
+      background-color: #f8fafc;
+    }
+    
+    .e-toolbar {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px;
+    }
+  }
+}

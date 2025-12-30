@@ -1,0 +1,166 @@
+<div class="form-builder-layout">
+  <!-- Header -->
+  <header class="builder-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="onCancel()" type="button">
+        <span class="material-icons">arrow_back</span>
+      </button>
+      <div class="form-info" (click)="openMetadataModal()">
+        <h1>{{ store.metadata().name || 'Untitled Form' }}</h1>
+        <span class="form-code">{{ store.metadata().code || 'Click to set form details' }}</span>
+      </div>
+      @if (store.isDirty()) {
+        <span class="unsaved-badge">Unsaved changes</span>
+      }
+    </div>
+    
+    <div class="header-center">
+      <div class="view-toggle">
+        <button class="toggle-btn active" type="button">
+          <span class="material-icons">edit</span>
+          Edit
+        </button>
+        <button class="toggle-btn" (click)="onPreview()" type="button">
+          <span class="material-icons">visibility</span>
+          Preview
+        </button>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <div class="toolbar-actions">
+        <button class="toolbar-btn" (click)="onUndo()" title="Undo" type="button" disabled>
+          <span class="material-icons">undo</span>
+        </button>
+        <button class="toolbar-btn" (click)="onRedo()" title="Redo" type="button" disabled>
+          <span class="material-icons">redo</span>
+        </button>
+      </div>
+      
+      <div class="header-actions">
+        <button class="action-btn secondary" (click)="onCancel()" type="button">
+          Cancel
+        </button>
+        <button 
+          class="action-btn primary" 
+          (click)="onSave()" 
+          [disabled]="store.isSaving()"
+          type="button">
+          @if (store.isSaving()) {
+            <span class="spinner"></span>
+            Saving...
+          } @else {
+            <span class="material-icons">save</span>
+            Save Form
+          }
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="builder-main" cdkDropListGroup>
+    <!-- Left Panel - Component Palette -->
+    <aside class="palette-panel">
+      <app-component-palette></app-component-palette>
+    </aside>
+
+    <!-- Center - Form Canvas -->
+    <section class="canvas-panel">
+      <app-form-canvas></app-form-canvas>
+    </section>
+
+    <!-- Right Panel - Properties -->
+    <aside class="properties-panel-container">
+      <app-properties-panel></app-properties-panel>
+    </aside>
+  </main>
+
+  <!-- Metadata Modal -->
+  @if (showMetadataModal()) {
+    <div class="modal-overlay" (click)="closeMetadataModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Form Details</h2>
+          <button class="close-btn" (click)="closeMetadataModal()" type="button">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="formCode">Form Code <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="formCode"
+              [(ngModel)]="formCode"
+              placeholder="e.g., PHQ9_V1">
+            <span class="field-hint">Unique identifier for this form</span>
+          </div>
+
+          <div class="form-group">
+            <label for="formName">Form Name <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="formName"
+              [(ngModel)]="formName"
+              placeholder="e.g., Patient Health Questionnaire-9">
+          </div>
+
+          <div class="form-group">
+            <label for="formDesc">Description</label>
+            <textarea 
+              id="formDesc"
+              [(ngModel)]="formDescription"
+              placeholder="Describe the purpose of this form"
+              rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="formCategory">Category</label>
+            <input 
+              type="text" 
+              id="formCategory"
+              [(ngModel)]="formCategory"
+              placeholder="e.g., MENTAL_HEALTH, INTAKE">
+          </div>
+
+          <div class="toggle-group">
+            <label class="toggle-label">
+              <input type="checkbox" [(ngModel)]="isStandard">
+              <span class="toggle-text">
+                <span class="toggle-title">Standard Form Template</span>
+                <span class="toggle-desc">This is a standardized form template</span>
+              </span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button class="modal-btn secondary" (click)="closeMetadataModal()" type="button">
+            Cancel
+          </button>
+          <button 
+            class="modal-btn primary" 
+            (click)="saveMetadata()"
+            [disabled]="!formCode || !formName"
+            type="button">
+            Save Details
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error Toast -->
+  @if (store.error()) {
+    <div class="error-toast">
+      <span class="material-icons">error</span>
+      <span>{{ store.error() }}</span>
+      <button (click)="store.setError(null)" type="button">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+  }
+</div>
+

@@ -1,0 +1,134 @@
+.form-editor-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .editor-header {
+    padding: 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+  }
+
+  .error-banner,
+  .success-banner {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .error-banner {
+    background-color: #fee;
+    border-bottom: 1px solid #fcc;
+    color: #c00;
+  }
+
+  .success-banner {
+    background-color: #efe;
+    border-bottom: 1px solid #cfc;
+    color: #060;
+  }
+
+  .tab-content {
+    padding: 20px;
+    overflow-y: auto;
+    height: calc(100vh - 180px);
+  }
+
+  .metadata-tab {
+    max-width: 800px;
+
+    .form-group {
+      margin-bottom: 24px;
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+
+        &.required::after {
+          content: ' *';
+          color: #f00;
+        }
+      }
+
+      small {
+        display: block;
+        margin-top: 4px;
+        color: #666;
+        font-size: 12px;
+      }
+
+      ejs-textbox {
+        width: 100%;
+      }
+    }
+  }
+
+  .sections-tab {
+    .sections-header {
+      margin-bottom: 20px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+
+      p {
+        font-size: 16px;
+      }
+    }
+
+    .sections-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+  .preview-tab {
+    .preview-info {
+      margin-bottom: 20px;
+      padding: 16px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+
+      h3 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        color: #333;
+      }
+
+      p {
+        margin: 0;
+        color: #666;
+      }
+    }
+
+    .preview-placeholder {
+      padding: 40px;
+      text-align: center;
+      background-color: #fafafa;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      color: #999;
+    }
+  }
+}

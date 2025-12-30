@@ -1,0 +1,345 @@
+<div class="question-editor">
+  <div class="question-header" (click)="toggleExpanded()">
+    <div class="question-info">
+      <span class="expand-icon">{{ isExpanded() ? '▼' : '▶' }}</span>
+      <span class="question-number">Q{{ questionIndex + 1 }}</span>
+      <span class="question-preview">{{ question.questionText || 'Untitled Question' }}</span>
+      <span class="question-type-badge">{{ selectedQuestionType()?.name }}</span>
+      @if (isRequired()) {
+        <span class="required-badge">Required</span>
+      }
+    </div>
+    <button
+      ejs-button
+      (click)="onRemoveQuestion(); $event.stopPropagation()"
+      cssClass="e-small e-danger"
+      iconCss="e-icons e-delete">
+    </button>
+  </div>
+
+  @if (isExpanded()) {
+    <div class="question-content">
+      <!-- Basic Configuration -->
+      <div class="config-section">
+        <div class="config-row">
+          <div class="form-group full-width">
+            <label for="questionText-{{ sectionIndex }}-{{ questionIndex }}" class="required">Question Text</label>
+            <ejs-textbox
+              id="questionText-{{ sectionIndex }}-{{ questionIndex }}"
+              [(ngModel)]="questionText"
+              (ngModelChange)="onQuestionChange()"
+              placeholder="Enter your question"
+              floatLabelType="Never">
+            </ejs-textbox>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <div class="form-group">
+            <label for="questionType-{{ sectionIndex }}-{{ questionIndex }}" class="required">Question Type</label>
+            <ejs-dropdownlist
+              id="questionType-{{ sectionIndex }}-{{ questionIndex }}"
+              [(ngModel)]="questionTypeId"
+              (ngModelChange)="onQuestionChange()"
+              [dataSource]="questionTypes()"
+              [fields]="questionTypeFields"
+              floatLabelType="Never">
+            </ejs-dropdownlist>
+          </div>
+
+          <div class="form-group">
+            <label for="displayOrder-{{ sectionIndex }}-{{ questionIndex }}">Display Order</label>
+            <ejs-numerictextbox
+              id="displayOrder-{{ sectionIndex }}-{{ questionIndex }}"
+              [(ngModel)]="displayOrder"
+              (ngModelChange)="onQuestionChange()"
+              format="n0"
+              min="0"
+              step="10"
+              floatLabelType="Never">
+            </ejs-numerictextbox>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <div class="form-group">
+            <label for="questionCode-{{ sectionIndex }}-{{ questionIndex }}">Question Code</label>
+            <ejs-textbox
+              id="questionCode-{{ sectionIndex }}-{{ questionIndex }}"
+              [(ngModel)]="questionCode"
+              (ngModelChange)="onQuestionChange()"
+              placeholder="Optional unique code"
+              floatLabelType="Never">
+            </ejs-textbox>
+          </div>
+
+          <div class="form-group">
+            <label for="helpText-{{ sectionIndex }}-{{ questionIndex }}">Help Text</label>
+            <ejs-textbox
+              id="helpText-{{ sectionIndex }}-{{ questionIndex }}"
+              [(ngModel)]="helpText"
+              (ngModelChange)="onQuestionChange()"
+              placeholder="Additional guidance for users"
+              floatLabelType="Never">
+            </ejs-textbox>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="isRequired"
+              (ngModelChange)="onQuestionChange()"
+              label="Required">
+            </ejs-checkbox>
+          </div>
+
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="isActive"
+              (ngModelChange)="onQuestionChange()"
+              label="Active">
+            </ejs-checkbox>
+          </div>
+
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="isPhi"
+              (ngModelChange)="onQuestionChange()"
+              label="Contains PHI">
+            </ejs-checkbox>
+          </div>
+        </div>
+      </div>
+
+      <!-- Options (for Radio, Checkbox, Dropdown, Rating) -->
+      @if (supportsOptions()) {
+        <div class="options-section">
+          <div class="options-header">
+            <h5>Answer Options</h5>
+            <button ejs-button (click)="onAddOption()" cssClass="e-small e-success">
+              Add Option
+            </button>
+          </div>
+
+          @if (question.options.length === 0) {
+            <div class="empty-options">
+              <p>No options added yet. Click "Add Option" to get started.</p>
+            </div>
+          } @else {
+            <div class="options-list">
+              @for (option of question.options; track $index) {
+                <div class="option-item">
+                  <span class="option-number">{{ $index + 1 }}</span>
+                  <ejs-textbox
+                    [(ngModel)]="option.optionText"
+                    (ngModelChange)="onUpdateOption($index, { optionText: option.optionText })"
+                    placeholder="Option text"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                  <ejs-textbox
+                    [(ngModel)]="option.optionValue"
+                    (ngModelChange)="onUpdateOption($index, { optionValue: option.optionValue })"
+                    placeholder="Value"
+                    floatLabelType="Never"
+                    cssClass="option-value">
+                  </ejs-textbox>
+                  <ejs-numerictextbox
+                    [(ngModel)]="option.numericScore"
+                    (ngModelChange)="onUpdateOption($index, { numericScore: option.numericScore })"
+                    placeholder="Score"
+                    format="n0"
+                    floatLabelType="Never"
+                    cssClass="option-score">
+                  </ejs-numerictextbox>
+                  <button
+                    ejs-button
+                    (click)="onRemoveOption($index)"
+                    cssClass="e-small e-danger"
+                    iconCss="e-icons e-delete">
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Advanced Settings -->
+      <div class="advanced-section">
+        <button
+          ejs-button
+          (click)="toggleAdvanced()"
+          cssClass="e-link">
+          {{ showAdvanced() ? '▼' : '▶' }} Advanced Settings
+        </button>
+
+        @if (showAdvanced()) {
+          <div class="advanced-content">
+            <!-- Validation Rules -->
+            <div class="config-group">
+              <h5>Validation</h5>
+              <div class="config-row">
+                <div class="form-group">
+                  <label for="minValue-{{ sectionIndex }}-{{ questionIndex }}">Min Value</label>
+                  <ejs-numerictextbox
+                    id="minValue-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="minValue"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="Minimum numeric value"
+                    floatLabelType="Never">
+                  </ejs-numerictextbox>
+                </div>
+
+                <div class="form-group">
+                  <label for="maxValue-{{ sectionIndex }}-{{ questionIndex }}">Max Value</label>
+                  <ejs-numerictextbox
+                    id="maxValue-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="maxValue"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="Maximum numeric value"
+                    floatLabelType="Never">
+                  </ejs-numerictextbox>
+                </div>
+              </div>
+
+              <div class="config-row">
+                <div class="form-group">
+                  <label for="minLength-{{ sectionIndex }}-{{ questionIndex }}">Min Length</label>
+                  <ejs-numerictextbox
+                    id="minLength-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="minLength"
+                    (ngModelChange)="onQuestionChange()"
+                    format="n0"
+                    min="0"
+                    placeholder="Minimum text length"
+                    floatLabelType="Never">
+                  </ejs-numerictextbox>
+                </div>
+
+                <div class="form-group">
+                  <label for="maxLength-{{ sectionIndex }}-{{ questionIndex }}">Max Length</label>
+                  <ejs-numerictextbox
+                    id="maxLength-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="maxLength"
+                    (ngModelChange)="onQuestionChange()"
+                    format="n0"
+                    min="0"
+                    placeholder="Maximum text length"
+                    floatLabelType="Never">
+                  </ejs-numerictextbox>
+                </div>
+              </div>
+
+              <div class="config-row">
+                <div class="form-group full-width">
+                  <label for="regexPattern-{{ sectionIndex }}-{{ questionIndex }}">Regex Pattern</label>
+                  <ejs-textbox
+                    id="regexPattern-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="regexPattern"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="Regular expression for validation"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                </div>
+              </div>
+
+              <div class="config-row">
+                <div class="form-group full-width">
+                  <label for="regexError-{{ sectionIndex }}-{{ questionIndex }}">Regex Error Message</label>
+                  <ejs-textbox
+                    id="regexError-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="regexErrorMessage"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="Error message for regex validation"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                </div>
+              </div>
+            </div>
+
+            <!-- Clinical Codes -->
+            <div class="config-group">
+              <h5>Clinical Codes</h5>
+              <div class="config-row">
+                <div class="form-group">
+                  <label for="cptCode-{{ sectionIndex }}-{{ questionIndex }}">CPT Code</label>
+                  <ejs-textbox
+                    id="cptCode-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="cptCode"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="CPT billing code"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                </div>
+
+                <div class="form-group">
+                  <label for="loincCode-{{ sectionIndex }}-{{ questionIndex }}">LOINC Code</label>
+                  <ejs-textbox
+                    id="loincCode-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="loincCode"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="LOINC code"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                </div>
+
+                <div class="form-group">
+                  <label for="snomedCode-{{ sectionIndex }}-{{ questionIndex }}">SNOMED Code</label>
+                  <ejs-textbox
+                    id="snomedCode-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="snomedCode"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="SNOMED CT code"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                </div>
+              </div>
+            </div>
+
+            <!-- Styling -->
+            <div class="config-group">
+              <h5>Styling</h5>
+              <div class="config-row">
+                <div class="form-group">
+                  <label for="backgroundColor-{{ sectionIndex }}-{{ questionIndex }}">Background Color</label>
+                  <ejs-textbox
+                    id="backgroundColor-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="backgroundColor"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="#FFFFFF"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                </div>
+
+                <div class="form-group">
+                  <label for="borderColor-{{ sectionIndex }}-{{ questionIndex }}">Border Color</label>
+                  <ejs-textbox
+                    id="borderColor-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="borderColor"
+                    (ngModelChange)="onQuestionChange()"
+                    placeholder="#CCCCCC"
+                    floatLabelType="Never">
+                  </ejs-textbox>
+                </div>
+
+                <div class="form-group">
+                  <label for="height-{{ sectionIndex }}-{{ questionIndex }}">Height (px)</label>
+                  <ejs-numerictextbox
+                    id="height-{{ sectionIndex }}-{{ questionIndex }}"
+                    [(ngModel)]="height"
+                    (ngModelChange)="onQuestionChange()"
+                    format="n0"
+                    min="0"
+                    placeholder="Height in pixels"
+                    floatLabelType="Never">
+                  </ejs-numerictextbox>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

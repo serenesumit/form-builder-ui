@@ -1,0 +1,75 @@
+<div class="form-list-container">
+  <div class="header">
+    <h1>Questionnaire Forms</h1>
+    <div class="header-actions">
+      <button ejs-button (click)="onCreateNew()" cssClass="e-primary">
+        <span class="material-icons" style="font-size: 18px; margin-right: 6px;">add</span>
+        Create New Form
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="error-message">
+      <p>{{ error() }}</p>
+      <button ejs-button (click)="loadForms()">Retry</button>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">
+      <p>Loading forms...</p>
+    </div>
+  } @else {
+    <ejs-grid
+      [dataSource]="forms()"
+      [allowPaging]="true"
+      [pageSettings]="pageSettings"
+      [toolbar]="toolbar"
+      [allowSorting]="true"
+      [allowFiltering]="true"
+      height="calc(100vh - 200px)">
+
+      <e-columns>
+        <e-column field="code" headerText="Code" width="120"></e-column>
+        <e-column field="name" headerText="Name" width="200"></e-column>
+        <e-column field="description" headerText="Description" width="250"></e-column>
+        <e-column field="category" headerText="Category" width="120"></e-column>
+        <e-column
+          field="isStandard"
+          headerText="Standard"
+          width="100"
+          [displayAsCheckBox]="true">
+        </e-column>
+        <e-column
+          headerText="Actions"
+          width="150"
+          [allowSorting]="false"
+          [allowFiltering]="false">
+          <ng-template #template let-data>
+            <div class="action-buttons">
+              <button
+                ejs-button
+                (click)="onView(data.definitionId)"
+                cssClass="e-small e-info"
+                iconCss="e-icons e-eye">
+              </button>
+              <button
+                ejs-button
+                (click)="onEdit(data.definitionId)"
+                cssClass="e-small e-success"
+                iconCss="e-icons e-edit">
+              </button>
+              <button
+                ejs-button
+                (click)="onDelete(data.definitionId)"
+                cssClass="e-small e-danger"
+                iconCss="e-icons e-delete">
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+      </e-columns>
+    </ejs-grid>
+  }
+</div>

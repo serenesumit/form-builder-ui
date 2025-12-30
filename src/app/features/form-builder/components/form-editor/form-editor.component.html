@@ -1,0 +1,157 @@
+<div class="form-editor-container">
+  <div class="editor-header">
+    <h1>{{ definitionId() ? 'Edit Form' : 'Create New Form' }}</h1>
+    <div class="header-actions">
+      <button ejs-button (click)="onPreview()" cssClass="e-info">
+        Preview
+      </button>
+      <button ejs-button (click)="onSave()" cssClass="e-success" [disabled]="formBuilderService.isLoading()">
+        {{ formBuilderService.isLoading() ? 'Saving...' : 'Save' }}
+      </button>
+      <button ejs-button (click)="onCancel()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  @if (formBuilderService.error()) {
+    <div class="error-banner">
+      <span>{{ formBuilderService.error() }}</span>
+      <button ejs-button (click)="formBuilderService.clearError()" cssClass="e-small">
+        Dismiss
+      </button>
+    </div>
+  }
+
+  @if (formBuilderService.savedResult()) {
+    <div class="success-banner">
+      <span>Form saved successfully! Definition ID: {{ formBuilderService.savedResult()?.definitionId }}</span>
+    </div>
+  }
+
+  <ejs-tab [selectedItem]="selectedTabIndex()" (selected)="onTabSelected($event)">
+    <e-tabitems>
+      <!-- Metadata Tab -->
+      <e-tabitem>
+        <ng-template #headerText>
+          <div>Form Details</div>
+        </ng-template>
+        <ng-template #content>
+          <div class="tab-content metadata-tab">
+            <div class="form-group">
+              <label for="formCode" class="required">Form Code</label>
+              <ejs-textbox
+                id="formCode"
+                [(ngModel)]="formCode"
+                (ngModelChange)="onMetadataChange()"
+                placeholder="e.g., PHQ9_V1"
+                floatLabelType="Never">
+              </ejs-textbox>
+              <small>Unique identifier for the form</small>
+            </div>
+
+            <div class="form-group">
+              <label for="formName" class="required">Form Name</label>
+              <ejs-textbox
+                id="formName"
+                [(ngModel)]="formName"
+                (ngModelChange)="onMetadataChange()"
+                placeholder="e.g., Patient Health Questionnaire-9"
+                floatLabelType="Never">
+              </ejs-textbox>
+              <small>Display name of the form</small>
+            </div>
+
+            <div class="form-group">
+              <label for="formDescription">Description</label>
+              <ejs-textbox
+                id="formDescription"
+                [(ngModel)]="formDescription"
+                (ngModelChange)="onMetadataChange()"
+                placeholder="Describe the purpose of this form"
+                floatLabelType="Never"
+                multiline="true">
+              </ejs-textbox>
+              <small>Detailed description of the form</small>
+            </div>
+
+            <div class="form-group">
+              <label for="formCategory">Category</label>
+              <ejs-textbox
+                id="formCategory"
+                [(ngModel)]="formCategory"
+                (ngModelChange)="onMetadataChange()"
+                placeholder="e.g., MENTAL_HEALTH, INTAKE"
+                floatLabelType="Never">
+              </ejs-textbox>
+              <small>Form category for organization</small>
+            </div>
+
+            <div class="form-group">
+              <ejs-checkbox
+                [(ngModel)]="isStandard"
+                (ngModelChange)="onMetadataChange()"
+                label="Standard Form Template">
+              </ejs-checkbox>
+              <small>Check if this is a standardized form template</small>
+            </div>
+          </div>
+        </ng-template>
+      </e-tabitem>
+
+      <!-- Sections Tab -->
+      <e-tabitem>
+        <ng-template #headerText>
+          <div>Sections & Questions ({{ formBuilderService.currentForm()?.sections?.length ?? 0 }})</div>
+        </ng-template>
+        <ng-template #content>
+          <div class="tab-content sections-tab">
+            <div class="sections-header">
+              <button ejs-button (click)="onAddSection()" cssClass="e-primary">
+                Add Section
+              </button>
+            </div>
+
+            @if ((formBuilderService.currentForm()?.sections?.length ?? 0) === 0) {
+              <div class="empty-state">
+                <p>No sections added yet. Click "Add Section" to get started.</p>
+              </div>
+            } @else {
+              <div class="sections-list">
+                @for (section of formBuilderService.currentForm()?.sections; track $index) {
+                  <app-section-editor
+                    [sectionIndex]="$index"
+                    [section]="section">
+                  </app-section-editor>
+                }
+              </div>
+            }
+          </div>
+        </ng-template>
+      </e-tabitem>
+
+      <!-- Preview Tab -->
+      <e-tabitem>
+        <ng-template #headerText>
+          <div>Preview</div>
+        </ng-template>
+        <ng-template #content>
+          <div class="tab-content preview-tab">
+            <div class="preview-info">
+              <h3>Form Preview</h3>
+              <p>This is how the form will appear to end users.</p>
+            </div>
+            @if (formBuilderService.currentForm()) {
+              <app-form-renderer [formDefinition]="formBuilderService.currentForm()!">
+              </app-form-renderer>
+            } @else {
+              <div class="preview-placeholder">
+                <p>No form data available to preview.</p>
+              </div>
+            }
+          </div>
+        </ng-template>
+      </e-tabitem>
+    </e-tabitems>
+  </ejs-tab>
+</div>

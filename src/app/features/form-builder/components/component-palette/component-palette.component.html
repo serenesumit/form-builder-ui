@@ -1,0 +1,54 @@
+<div class="component-palette">
+  <div class="palette-header">
+    <h3>Components</h3>
+    <span class="palette-hint">Drag to canvas</span>
+  </div>
+
+  <div 
+    class="palette-categories"
+    cdkDropList
+    id="palette-list"
+    [cdkDropListSortingDisabled]="true"
+    [cdkDropListEnterPredicate]="noReturnPredicate">
+    @for (category of store.paletteCategories(); track category.id) {
+      <div class="palette-category" [class.expanded]="category.expanded">
+        <button 
+          class="category-header"
+          (click)="toggleCategory(category.id)"
+          type="button">
+          <span class="category-icon material-icons">{{ category.icon }}</span>
+          <span class="category-name">{{ category.name }}</span>
+          <span class="expand-icon material-icons">
+            {{ category.expanded ? 'expand_less' : 'expand_more' }}
+          </span>
+        </button>
+
+        @if (category.expanded) {
+          <div class="category-items">
+            @for (item of category.items; track item.id) {
+              <div 
+                class="palette-item"
+                cdkDrag
+                [cdkDragData]="item"
+                (cdkDragStarted)="onDragStarted(item)"
+                (cdkDragEnded)="onDragEnded()">
+                <div class="palette-item-preview" *cdkDragPreview>
+                  <span class="material-icons">{{ item.icon }}</span>
+                  <span>{{ item.name }}</span>
+                </div>
+                <div class="palette-item-placeholder" *cdkDragPlaceholder></div>
+                <span class="item-icon material-icons">{{ item.icon }}</span>
+                <div class="item-info">
+                  <span class="item-name">{{ item.name }}</span>
+                  <span class="item-description">{{ item.description }}</span>
+                </div>
+                <span class="drag-handle material-icons">drag_indicator</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+

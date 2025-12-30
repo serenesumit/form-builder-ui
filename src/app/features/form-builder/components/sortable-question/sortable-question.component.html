@@ -1,0 +1,72 @@
+<div 
+  class="sortable-question"
+  [class.selected]="isSelected()"
+  [class.dragging]="isDragging()"
+  (click)="onSelect($event)">
+  
+  <div class="question-drag-handle">
+    <span class="material-icons">drag_indicator</span>
+  </div>
+
+  <div class="question-content">
+    <div class="question-header">
+      <div class="question-type">
+        <span class="type-icon material-icons">{{ typeIcon }}</span>
+        <span class="type-name">{{ typeName }}</span>
+      </div>
+      @if (question().isRequired) {
+        <span class="required-badge">Required</span>
+      }
+      @if (question().isPhi) {
+        <span class="phi-badge" title="Protected Health Information">PHI</span>
+      }
+    </div>
+
+    <div class="question-text">
+      {{ question().questionText }}
+    </div>
+
+    @if (question().helpText) {
+      <div class="question-help">
+        <span class="material-icons">help_outline</span>
+        {{ question().helpText }}
+      </div>
+    }
+
+    @if (hasOptions && optionCount > 0) {
+      <div class="question-options-preview">
+        @for (option of question().options.slice(0, 3); track option.id) {
+          <span class="option-chip">{{ option.text }}</span>
+        }
+        @if (optionCount > 3) {
+          <span class="option-more">+{{ optionCount - 3 }} more</span>
+        }
+      </div>
+    }
+
+    @if (question().placeholderText) {
+      <div class="question-placeholder">
+        <span class="material-icons">text_fields</span>
+        Placeholder: {{ question().placeholderText }}
+      </div>
+    }
+  </div>
+
+  <div class="question-actions">
+    <button 
+      class="action-btn duplicate"
+      (click)="onDuplicate($event)"
+      title="Duplicate question"
+      type="button">
+      <span class="material-icons">content_copy</span>
+    </button>
+    <button 
+      class="action-btn delete"
+      (click)="onDelete($event)"
+      title="Delete question"
+      type="button">
+      <span class="material-icons">delete_outline</span>
+    </button>
+  </div>
+</div>
+

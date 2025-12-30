@@ -1,0 +1,141 @@
+<div class="section-editor">
+  <div class="section-header" (click)="toggleExpanded()">
+    <div class="section-title">
+      <span class="expand-icon">{{ isExpanded() ? '▼' : '▶' }}</span>
+      <h3>{{ section.sectionName || 'Untitled Section' }}</h3>
+      <span class="question-count">({{ section.questions.length }} questions)</span>
+    </div>
+    <button
+      ejs-button
+      (click)="onRemoveSection(); $event.stopPropagation()"
+      cssClass="e-small e-danger"
+      iconCss="e-icons e-delete">
+    </button>
+  </div>
+
+  @if (isExpanded()) {
+    <div class="section-content">
+      <!-- Section Configuration -->
+      <div class="section-config">
+        <div class="config-row">
+          <div class="form-group">
+            <label for="sectionName-{{ sectionIndex }}" class="required">Section Name</label>
+            <ejs-textbox
+              id="sectionName-{{ sectionIndex }}"
+              [(ngModel)]="sectionName"
+              (ngModelChange)="onSectionChange()"
+              placeholder="Enter section name"
+              floatLabelType="Never">
+            </ejs-textbox>
+          </div>
+
+          <div class="form-group">
+            <label for="sortOrder-{{ sectionIndex }}">Sort Order</label>
+            <ejs-numerictextbox
+              id="sortOrder-{{ sectionIndex }}"
+              [(ngModel)]="sortOrder"
+              (ngModelChange)="onSectionChange()"
+              format="n0"
+              min="0"
+              step="10"
+              floatLabelType="Never">
+            </ejs-numerictextbox>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="sectionDescription-{{ sectionIndex }}">Description</label>
+          <ejs-textbox
+            id="sectionDescription-{{ sectionIndex }}"
+            [(ngModel)]="sectionDescription"
+            (ngModelChange)="onSectionChange()"
+            placeholder="Optional section description"
+            floatLabelType="Never"
+            multiline="true">
+          </ejs-textbox>
+        </div>
+
+        <div class="config-row">
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="isRepeatable"
+              (ngModelChange)="onSectionChange()"
+              label="Repeatable Section">
+            </ejs-checkbox>
+          </div>
+
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="progressIndicator"
+              (ngModelChange)="onSectionChange()"
+              label="Show Progress">
+            </ejs-checkbox>
+          </div>
+
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="isCollapsible"
+              (ngModelChange)="onSectionChange()"
+              label="Collapsible">
+            </ejs-checkbox>
+          </div>
+        </div>
+
+        @if (isRepeatable()) {
+          <div class="config-row">
+            <div class="form-group">
+              <label for="minRepeat-{{ sectionIndex }}">Min Repeats</label>
+              <ejs-numerictextbox
+                id="minRepeat-{{ sectionIndex }}"
+                [(ngModel)]="minRepeat"
+                (ngModelChange)="onSectionChange()"
+                format="n0"
+                min="1"
+                floatLabelType="Never">
+              </ejs-numerictextbox>
+            </div>
+
+            <div class="form-group">
+              <label for="maxRepeat-{{ sectionIndex }}">Max Repeats</label>
+              <ejs-numerictextbox
+                id="maxRepeat-{{ sectionIndex }}"
+                [(ngModel)]="maxRepeat"
+                (ngModelChange)="onSectionChange()"
+                format="n0"
+                min="1"
+                placeholder="Unlimited"
+                floatLabelType="Never">
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Questions -->
+      <div class="questions-section">
+        <div class="questions-header">
+          <h4>Questions</h4>
+          <button ejs-button (click)="onAddQuestion()" cssClass="e-small e-success">
+            Add Question
+          </button>
+        </div>
+
+        @if (section.questions.length === 0) {
+          <div class="empty-questions">
+            <p>No questions added yet. Click "Add Question" to get started.</p>
+          </div>
+        } @else {
+          <div class="questions-list">
+            @for (question of section.questions; track $index) {
+              <app-question-editor
+                [sectionIndex]="sectionIndex"
+                [questionIndex]="$index"
+                [question]="question">
+              </app-question-editor>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
