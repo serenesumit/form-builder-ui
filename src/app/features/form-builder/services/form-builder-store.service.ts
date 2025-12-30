@@ -18,7 +18,10 @@ import {
   SaveFormRequest,
   FormBuilderSectionRequest,
   FormQuestionRequest,
-  FormQuestionOptionRequest
+  FormQuestionOptionRequest,
+  FormBuilderDto,
+  FormBuilderSectionDto,
+  FormBuilderQuestionDto
 } from '@core/models/form-builder.models';
 
 const initialState: FormBuilderStoreState = {
@@ -105,6 +108,87 @@ export class FormBuilderStoreService {
       ...initialState,
       sections: [createDefaultSection(0)]
     });
+  }
+
+  loadFormFromApi(formData: FormBuilderDto): void {
+    // Convert API response (with sections) to store format
+    const sections: CanvasSection[] = formData.sections?.length > 0
+      ? formData.sections.map((section, sectionIndex) => this.convertApiSectionToCanvas(section, sectionIndex))
+      : [createDefaultSection(0)];
+
+    this.state.set({
+      ...initialState,
+      metadata: {
+        code: formData.code,
+        name: formData.name,
+        description: formData.description || '',
+        category: formData.category || '',
+        isStandard: formData.isStandard || false
+      },
+      sections,
+      isDirty: false
+    });
+  }
+
+  private convertApiSectionToCanvas(apiSection: FormBuilderSectionDto, index: number): CanvasSection {
+    return {
+      id: apiSection.sectionId || generateId(),
+      name: apiSection.sectionName,
+      description: apiSection.sectionDescription || '',
+      sortOrder: apiSection.sortOrder ?? index,
+      isRepeatable: apiSection.isRepeatable || false,
+      minRepeat: apiSection.minRepeat || 1,
+      maxRepeat: apiSection.maxRepeat ?? undefined,
+      progressIndicator: apiSection.progressIndicator || false,
+      isCollapsible: apiSection.isCollapsible || false,
+      isCollapsed: false,
+      questions: apiSection.questions?.map((q, qIndex) => this.convertApiQuestionToCanvas(q, qIndex)) || []
+    };
+  }
+
+  private convertApiQuestionToCanvas(apiQuestion: FormBuilderQuestionDto, index: number): CanvasQuestion {
+    return {
+      id: apiQuestion.questionId || generateId(),
+      questionCode: apiQuestion.questionCode || '',
+      questionText: apiQuestion.questionText,
+      questionTypeId: apiQuestion.questionTypeId,
+      helpText: apiQuestion.helpText || '',
+      isRequired: apiQuestion.isRequired,
+      displayOrder: apiQuestion.sortOrder ?? index,
+      isActive: true,
+      backgroundColor: apiQuestion.backgroundColor,
+      borderColor: apiQuestion.borderColor,
+      placeholderText: apiQuestion.placeholderText || '',
+      defaultValue: apiQuestion.defaultValue || '',
+      isPhi: apiQuestion.isPHI || false,
+      cptCode: apiQuestion.cptCode,
+      loincCode: apiQuestion.loincCode,
+      snomedCode: apiQuestion.snomedCode,
+      isCalculated: apiQuestion.isCalculated || false,
+      calculationFormula: apiQuestion.calculationExpression,
+      minValue: apiQuestion.minValue ?? undefined,
+      maxValue: apiQuestion.maxValue ?? undefined,
+      minLength: apiQuestion.minLength ?? undefined,
+      maxLength: apiQuestion.maxLength ?? undefined,
+      regexPattern: apiQuestion.regexPattern,
+      regexErrorMessage: apiQuestion.regexErrorMessage,
+      options: apiQuestion.options?.map((opt, optIndex) => ({
+        id: opt.optionId || generateId(),
+        text: opt.optionText,
+        value: opt.optionValue || opt.optionText,
+        displayOrder: opt.sortOrder ?? optIndex,
+        numericScore: opt.numericScore ?? undefined
+      })) || [],
+      conditionalRules: apiQuestion.conditionalRules?.map(rule => ({
+        id: rule.ruleId || generateId(),
+        sourceQuestionId: rule.sourceQuestionId,
+        operator: rule.operator as any,
+        compareValue: rule.compareValue,
+        compareToQuestionId: rule.compareToQuestionId,
+        actionType: rule.actionType as any,
+        sortOrder: rule.sortOrder
+      })) || []
+    };
   }
 
   resetState(): void {

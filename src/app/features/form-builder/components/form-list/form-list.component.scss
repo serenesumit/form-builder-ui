@@ -115,5 +115,22 @@
       border-bottom: 1px solid #e2e8f0;
       padding: 12px;
     }
+
+    // Hide the grid's default spinner/loading indicator
+    .e-spinner-pane,
+    .e-spin-show {
+      display: none !important;
+    }
+
+    // Ensure action buttons are always clickable
+    .action-buttons {
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
+      
+      button {
+        pointer-events: auto;
+      }
+    }
   }
 }

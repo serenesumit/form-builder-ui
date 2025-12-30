@@ -59,22 +59,29 @@
   </header>
 
   <!-- Main Content -->
-  <main class="builder-main" cdkDropListGroup>
-    <!-- Left Panel - Component Palette -->
-    <aside class="palette-panel">
-      <app-component-palette></app-component-palette>
-    </aside>
+  @if (store.isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Loading form...</p>
+    </div>
+  } @else {
+    <main class="builder-main" cdkDropListGroup>
+      <!-- Left Panel - Component Palette -->
+      <aside class="palette-panel">
+        <app-component-palette></app-component-palette>
+      </aside>
 
-    <!-- Center - Form Canvas -->
-    <section class="canvas-panel">
-      <app-form-canvas></app-form-canvas>
-    </section>
+      <!-- Center - Form Canvas -->
+      <section class="canvas-panel">
+        <app-form-canvas></app-form-canvas>
+      </section>
 
-    <!-- Right Panel - Properties -->
-    <aside class="properties-panel-container">
-      <app-properties-panel></app-properties-panel>
-    </aside>
-  </main>
+      <!-- Right Panel - Properties -->
+      <aside class="properties-panel-container">
+        <app-properties-panel></app-properties-panel>
+      </aside>
+    </main>
+  }
 
   <!-- Metadata Modal -->
   @if (showMetadataModal()) {

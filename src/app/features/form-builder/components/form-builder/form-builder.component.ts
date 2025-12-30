@@ -44,8 +44,7 @@ export class FormBuilderComponent implements OnInit {
     
     if (id && id !== 'new') {
       this.definitionId.set(id);
-      // TODO: Load existing form
-      this.store.initializeNewForm();
+      this.loadForm(id);
     } else {
       this.store.initializeNewForm();
       // Show metadata modal for new forms
@@ -54,6 +53,25 @@ export class FormBuilderComponent implements OnInit {
     
     // Sync metadata with store
     this.syncMetadataFromStore();
+  }
+
+  private loadForm(definitionId: string): void {
+    this.store.setLoading(true);
+    this.store.setError(null);
+    
+    this.apiService.getFormByDefinitionId(definitionId).subscribe({
+      next: (formData) => {
+        this.store.loadFormFromApi(formData);
+        this.syncMetadataFromStore();
+        this.store.setLoading(false);
+      },
+      error: (error) => {
+        this.store.setError(error.message || 'Failed to load form');
+        this.store.setLoading(false);
+        // Initialize empty form on error
+        this.store.initializeNewForm();
+      }
+    });
   }
 
   syncMetadataFromStore(): void {

@@ -55,24 +55,24 @@
           [allowSorting]="false"
           [allowFiltering]="false">
           <ng-template #template let-data>
-            <div class="action-buttons">
+            <div class="action-buttons" (click)="$event.stopPropagation()">
               <button
                 ejs-button
-                (click)="onView(data.definitionId)"
+                (click)="onView(data.definitionId); $event.stopPropagation()"
                 cssClass="e-small e-info"
                 iconCss="e-icons e-eye"
                 title="View">
               </button>
               <button
                 ejs-button
-                (click)="onEdit(data.definitionId)"
+                (click)="onEdit(data.definitionId); $event.stopPropagation()"
                 cssClass="e-small e-success"
                 iconCss="e-icons e-edit"
                 title="Edit">
               </button>
               <button
                 ejs-button
-                (click)="onDelete(data.definitionId)"
+                (click)="onDelete(data.definitionId); $event.stopPropagation()"
                 cssClass="e-small e-danger"
                 iconCss="e-icons e-delete"
                 title="Delete">

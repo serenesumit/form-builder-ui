@@ -95,33 +95,91 @@ export interface FormListItemDto {
   versionCount: number;
 }
 
+// API Response DTOs (matching backend FormDefinitionResponse)
 export interface FormBuilderDto {
+  tenantId?: string;
   definitionId: string;
-  latestVersionId: string;
+  versionId?: string;
   code: string;
   name: string;
   description?: string;
   category?: string;
-  isStandard: boolean;
+  isStandard?: boolean;
+  sections: FormBuilderSectionDto[];
+}
+
+export interface FormBuilderSectionDto {
+  sectionId: string;
+  sectionName: string;
+  sectionDescription?: string;
+  sortOrder: number;
+  isRepeatable: boolean;
+  minRepeat: number;
+  maxRepeat?: number | null;
+  progressIndicator: boolean;
+  isCollapsible?: boolean;
   questions: FormBuilderQuestionDto[];
 }
 
 export interface FormBuilderQuestionDto {
   questionId: string;
+  sectionId?: string;
+  questionCode?: string;
   questionText: string;
   questionTypeId: number;
-  questionTypeName: string;
-  isRequired: boolean;
-  displayOrder: number;
+  questionTypeName?: string;
   helpText?: string;
+  isRequired: boolean;
+  sortOrder: number;
+  backgroundColor?: string;
+  borderColor?: string;
+  height?: number | null;
+  isStandardForm?: boolean;
+  displayOnEncounter?: boolean;
+  minValue?: number | null;
+  maxValue?: number | null;
+  stepValue?: number | null;
+  minLength?: number | null;
+  maxLength?: number | null;
+  regexPattern?: string;
+  regexErrorMessage?: string;
+  placeholderText?: string;
+  defaultValue?: string;
+  isPHI?: boolean;
+  cptCode?: string;
+  loincCode?: string;
+  snomedCode?: string;
+  isCalculated?: boolean;
+  calculationExpression?: string;
   options: FormBuilderOptionDto[];
+  conditionalRules?: FormBuilderConditionalRuleDto[];
+  validationRules?: FormBuilderValidationRuleDto[];
 }
 
 export interface FormBuilderOptionDto {
   optionId: string;
   optionText: string;
-  score?: number;
-  displayOrder: number;
+  optionValue?: string;
+  numericScore?: number | null;
+  sortOrder: number;
+}
+
+export interface FormBuilderConditionalRuleDto {
+  ruleId: string;
+  sourceQuestionId?: string;
+  operator: string;
+  compareValue?: string;
+  compareToQuestionId?: string;
+  actionType: string;
+  sortOrder: number;
+}
+
+export interface FormBuilderValidationRuleDto {
+  validationId: string;
+  ruleName: string;
+  expression: string;
+  errorMessage: string;
+  isActive: boolean;
 }
 
 // Enums
