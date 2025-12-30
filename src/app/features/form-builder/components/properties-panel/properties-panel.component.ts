@@ -6,17 +6,19 @@ import {
   CanvasQuestion, 
   CanvasSection,
   CanvasQuestionOption,
+  CanvasConditionalRule,
   getQuestionTypeName,
   getQuestionTypeIcon,
   questionTypeSupportsOptions
 } from '../../models/form-builder.types';
+import { ConditionalLogicBuilderComponent } from '../conditional-logic-builder/conditional-logic-builder.component';
 
-type PanelTab = 'general' | 'validation' | 'options' | 'advanced';
+type PanelTab = 'general' | 'validation' | 'options' | 'logic' | 'advanced';
 
 @Component({
   selector: 'app-properties-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConditionalLogicBuilderComponent],
   templateUrl: './properties-panel.component.html',
   styleUrls: ['./properties-panel.component.scss']
 })
@@ -256,6 +258,11 @@ export class PropertiesPanelComponent {
     if (question) {
       this.options = [...question.options];
     }
+  }
+
+  // Conditional Logic Updates
+  onConditionalRulesChange(rules: CanvasConditionalRule[]): void {
+    this.updateQuestionField('conditionalRules', rules);
   }
 }
 

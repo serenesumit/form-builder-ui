@@ -1,0 +1,153 @@
+<div class="conditional-logic-builder">
+  <div class="logic-header">
+    <div class="header-info">
+      <span class="material-icons">account_tree</span>
+      <div>
+        <h4>Conditional Logic</h4>
+        <p class="subtitle">Show, hide, or modify this question based on other answers</p>
+      </div>
+    </div>
+    <button class="add-rule-btn" (click)="addRule()" type="button">
+      <span class="material-icons">add</span>
+      Add Rule
+    </button>
+  </div>
+
+  @if (question().conditionalRules.length === 0) {
+    <div class="empty-state">
+      <span class="material-icons">rule</span>
+      <p>No conditional logic defined</p>
+      <span class="hint">Add rules to control when this question appears</span>
+    </div>
+  } @else {
+    <div class="rules-list">
+      @for (rule of question().conditionalRules; track rule.id; let i = $index) {
+        <div class="rule-card">
+          <div class="rule-header">
+            <span class="rule-number">#{{ i + 1 }}</span>
+            <button class="delete-rule-btn" (click)="deleteRule(i)" type="button" title="Delete rule">
+              <span class="material-icons">delete_outline</span>
+            </button>
+          </div>
+
+          <div class="rule-content">
+            <!-- Action Type -->
+            <div class="rule-row">
+              <select
+                class="action-select"
+                [ngModel]="rule.actionType"
+                (ngModelChange)="updateRule(i, 'actionType', $event)">
+                @for (action of actionTypes; track action.value) {
+                  <option [value]="action.value">{{ action.label }}</option>
+                }
+              </select>
+              <span class="rule-text">this question when</span>
+            </div>
+
+            <!-- Source Question -->
+            <div class="rule-row">
+              <label class="rule-label">Question:</label>
+              <select
+                class="source-question-select"
+                [ngModel]="rule.sourceQuestionId"
+                (ngModelChange)="updateRule(i, 'sourceQuestionId', $event)">
+                <option value="">Select a question...</option>
+                @for (q of availableSourceQuestions(); track q.id) {
+                  <option [value]="q.id">{{ q.text }} ({{ q.sectionName }})</option>
+                }
+              </select>
+            </div>
+
+            <!-- Operator -->
+            <div class="rule-row">
+              <label class="rule-label">Condition:</label>
+              <select
+                class="operator-select"
+                [ngModel]="rule.operator"
+                (ngModelChange)="updateRule(i, 'operator', $event)">
+                @for (op of operators; track op.value) {
+                  <option [value]="op.value">{{ op.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Compare Value -->
+            @if (requiresValue(rule.operator)) {
+              <div class="rule-row">
+                <label class="rule-label">Value:</label>
+                @if (hasSourceQuestionOptions(rule.sourceQuestionId || '')) {
+                  <select
+                    class="value-select"
+                    [ngModel]="rule.compareValue"
+                    (ngModelChange)="updateRule(i, 'compareValue', $event)">
+                    <option value="">Select a value...</option>
+                    @for (opt of getSourceQuestionOptions(rule.sourceQuestionId || ''); track opt.value) {
+                      <option [value]="opt.value">{{ opt.text }}</option>
+                    }
+                  </select>
+                } @else {
+                  <input
+                    type="text"
+                    class="value-input"
+                    [ngModel]="rule.compareValue"
+                    (ngModelChange)="updateRule(i, 'compareValue', $event)"
+                    placeholder="Enter value to compare">
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Join indicator for multiple rules -->
+          @if (i < question().conditionalRules.length - 1) {
+            <div class="rule-join-indicator">
+              <span class="join-badge" [class.and]="joinType() === 'AND'" [class.or]="joinType() === 'OR'">
+                {{ joinType() }}
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Join Type Selector (only show if multiple rules) -->
+    @if (question().conditionalRules.length > 1) {
+      <div class="join-type-selector">
+        <span class="join-label">Combine rules using:</span>
+        <div class="join-options">
+          <label class="join-option">
+            <input
+              type="radio"
+              name="joinType"
+              value="AND"
+              [checked]="joinType() === 'AND'"
+              (change)="updateJoinType('AND')">
+            <span class="option-text">
+              <strong>AND</strong>
+              <span class="option-desc">All conditions must be met</span>
+            </span>
+          </label>
+          <label class="join-option">
+            <input
+              type="radio"
+              name="joinType"
+              value="OR"
+              [checked]="joinType() === 'OR'"
+              (change)="updateJoinType('OR')">
+            <span class="option-text">
+              <strong>OR</strong>
+              <span class="option-desc">Any condition can be met</span>
+            </span>
+          </label>
+        </div>
+      </div>
+    }
+  }
+
+  @if (availableSourceQuestions().length === 0 && question().conditionalRules.length === 0) {
+    <div class="info-box">
+      <span class="material-icons">info</span>
+      <p>Add questions before this one to create conditional logic rules.</p>
+    </div>
+  }
+</div>
+
