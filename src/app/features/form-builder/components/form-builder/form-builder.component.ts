@@ -7,9 +7,11 @@ import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { FormBuilderStoreService } from '../../services/form-builder-store.service';
 import { FormBuilderApiService } from '@core/services/form-builder-api.service';
+import { FormVersionDto } from '@core/models/form-builder.models';
 import { ComponentPaletteComponent } from '../component-palette/component-palette.component';
 import { FormCanvasComponent } from '../form-canvas/form-canvas.component';
 import { PropertiesPanelComponent } from '../properties-panel/properties-panel.component';
+import { VersionSelectorComponent } from '../version-selector/version-selector.component';
 
 @Component({
   selector: 'app-form-builder',
@@ -23,7 +25,8 @@ import { PropertiesPanelComponent } from '../properties-panel/properties-panel.c
     CheckBoxModule,
     ComponentPaletteComponent,
     FormCanvasComponent,
-    PropertiesPanelComponent
+    PropertiesPanelComponent,
+    VersionSelectorComponent
   ],
   templateUrl: './form-builder.component.html',
   styleUrls: ['./form-builder.component.scss']
@@ -35,6 +38,9 @@ export class FormBuilderComponent implements OnInit {
   readonly store = inject(FormBuilderStoreService);
 
   definitionId = signal<string | null>(null);
+  currentVersionId = signal<string | null>(null);
+  versions = signal<FormVersionDto[]>([]);
+  isLoadingVersions = signal<boolean>(false);
   showMetadataModal = signal<boolean>(false);
   
   // Metadata form values
@@ -65,17 +71,67 @@ export class FormBuilderComponent implements OnInit {
     this.store.setLoading(true);
     this.store.setError(null);
     
+    // Load form data
     this.apiService.getFormByDefinitionId(definitionId).subscribe({
       next: (formData) => {
         this.store.loadFormFromApi(formData);
         this.syncMetadataFromStore();
         this.store.setLoading(false);
+        
+        // Set current version ID from the loaded form
+        if (formData.versionId) {
+          this.currentVersionId.set(formData.versionId);
+        } else if (formData.latestVersionId) {
+          this.currentVersionId.set(formData.latestVersionId);
+        }
       },
       error: (error) => {
         this.store.setError(error.message || 'Failed to load form');
         this.store.setLoading(false);
         // Initialize empty form on error
         this.store.initializeNewForm();
+      }
+    });
+    
+    // Load versions list
+    this.loadVersions(definitionId);
+  }
+
+  private loadVersions(definitionId: string): void {
+    this.isLoadingVersions.set(true);
+    
+    this.apiService.getFormVersions(definitionId).subscribe({
+      next: (versions) => {
+        this.versions.set(versions);
+        this.isLoadingVersions.set(false);
+      },
+      error: (error) => {
+        console.error('Failed to load versions:', error);
+        this.versions.set([]);
+        this.isLoadingVersions.set(false);
+      }
+    });
+  }
+
+  onVersionChange(versionId: string): void {
+    if (this.store.isDirty()) {
+      if (!confirm('You have unsaved changes. Are you sure you want to switch versions?')) {
+        return;
+      }
+    }
+    
+    this.store.setLoading(true);
+    this.currentVersionId.set(versionId);
+    
+    this.apiService.getFormByVersionId(versionId).subscribe({
+      next: (formData) => {
+        this.store.loadFormFromApi(formData);
+        this.syncMetadataFromStore();
+        this.store.setLoading(false);
+      },
+      error: (error) => {
+        this.store.setError(error.message || 'Failed to load version');
+        this.store.setLoading(false);
       }
     });
   }

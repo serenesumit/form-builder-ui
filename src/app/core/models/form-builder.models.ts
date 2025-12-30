@@ -81,6 +81,29 @@ export interface SaveFormResult {
   versionId: string;
 }
 
+// Version-related interfaces
+export enum VersionStatus {
+  Draft = 'Draft',
+  Published = 'Published',
+  Retired = 'Retired',
+  Archived = 'Archived'
+}
+
+export interface FormVersionDto {
+  versionId: string;
+  definitionId: string;
+  versionNumber: number;
+  versionLabel?: string;
+  name?: string;
+  description?: string;
+  status: VersionStatus;
+  createdDate: string;
+  publishedDate?: string;
+  retiredDate?: string;
+  createdBy?: string;
+  changeNotes?: string;
+}
+
 export interface FormListItemDto {
   definitionId: string;
   currentVersionId?: string;

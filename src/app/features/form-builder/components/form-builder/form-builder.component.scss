@@ -274,10 +274,18 @@
   background: linear-gradient(180deg, #1a1f2e 0%, #151922 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
+  flex-wrap: wrap;
   
   .toolbar-hint {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 8px;
   }
   
   // Syncfusion checkbox styling for dark background

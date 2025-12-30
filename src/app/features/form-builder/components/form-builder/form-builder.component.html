@@ -74,6 +74,15 @@
       <!-- Center - Form Canvas -->
       <section class="canvas-panel">
         <div class="canvas-toolbar">
+          @if (definitionId()) {
+            <app-version-selector
+              [versions]="versions()"
+              [currentVersionId]="currentVersionId()"
+              [isLoading]="isLoadingVersions()"
+              (versionChange)="onVersionChange($event)">
+            </app-version-selector>
+            <div class="toolbar-divider"></div>
+          }
           <ejs-checkbox
             [(ngModel)]="allowVersioning"
             (ngModelChange)="onAllowVersioningChange()"

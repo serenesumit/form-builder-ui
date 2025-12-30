@@ -7,6 +7,7 @@ import {
   SaveFormResult,
   FormBuilderDto,
   FormListItemDto,
+  FormVersionDto,
   ApiError
 } from '../models/form-builder.models';
 
@@ -55,6 +56,14 @@ export class FormBuilderApiService {
    */
   getFormByVersionId(versionId: string): Observable<FormBuilderDto> {
     return this.http.get<FormBuilderDto>(`${this.baseUrl}/versions/${versionId}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Retrieves all versions for a form definition
+   */
+  getFormVersions(definitionId: string): Observable<FormVersionDto[]> {
+    return this.http.get<FormVersionDto[]>(`${this.baseUrl}/${definitionId}/versions`)
       .pipe(catchError(this.handleError));
   }
 

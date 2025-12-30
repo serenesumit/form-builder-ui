@@ -1,0 +1,49 @@
+<div class="version-selector">
+  <div class="version-label">
+    <span class="material-icons">history</span>
+    <span>Version:</span>
+  </div>
+  
+  <div class="version-dropdown-container">
+    <ejs-dropdownlist
+      [dataSource]="dropdownData()"
+      [fields]="fields"
+      [value]="_currentVersionId()"
+      [enabled]="!isLoading && sortedVersions().length > 0"
+      placeholder="Select Version"
+      (select)="onVersionSelect($event)"
+      cssClass="version-dropdown">
+      <ng-template #itemTemplate let-data>
+        <div class="version-item">
+          <div class="version-item-header">
+            <span class="version-number">Version {{ data.versionNumber }}</span>
+            <span class="version-status" [ngClass]="getStatusClass(data.status)">
+              {{ data.status }}
+            </span>
+          </div>
+        </div>
+      </ng-template>
+    </ejs-dropdownlist>
+  </div>
+
+  @if (currentVersion()) {
+    <div class="current-version-info">
+      <span class="version-status-badge" [ngClass]="getStatusClass(currentVersion()!.status)">
+        {{ currentVersion()!.status }}
+      </span>
+      @if (currentVersion()!.createdDate) {
+        <span class="version-date">
+          Created: {{ formatDate(currentVersion()!.createdDate) }}
+        </span>
+      }
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-indicator">
+      <span class="spinner-small"></span>
+      <span>Loading...</span>
+    </div>
+  }
+</div>
+
