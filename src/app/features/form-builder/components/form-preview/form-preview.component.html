@@ -1,0 +1,236 @@
+<div class="form-preview">
+  <div class="form-preview-header">
+    <h2 class="form-preview-title">Form Preview</h2>
+    @if (readonly) {
+      <div class="readonly-badge">Read Only Mode</div>
+    }
+  </div>
+
+  <div class="sections-container">
+    @for (section of getSortedSections(); track section.sectionId) {
+      @if (getSectionQuestions(section.sectionId).length > 0) {
+        <div class="section-container">
+          <h3 class="section-title">{{ section.sectionName }}</h3>
+          @if (section.sectionDescription) {
+            <p class="section-description">{{ section.sectionDescription }}</p>
+          }
+
+          <div class="questions-container">
+            @for (question of getSectionQuestions(section.sectionId); track question.questionId) {
+              <div class="question-item"
+                   [style.background-color]="question.backgroundColor || 'transparent'"
+                   [style.border-color]="question.borderColor || '#e5e7eb'"
+                   [style.min-height.px]="question.height || 'auto'">
+
+                <label class="question-label">
+                  {{ question.questionText }}
+                  @if (question.isRequired) {
+                    <span class="required-indicator">*</span>
+                  }
+                </label>
+
+                @if (question.helpText) {
+                  <p class="help-text">{{ question.helpText }}</p>
+                }
+
+                <!-- Text Input -->
+                @if (question.questionTypeId === QuestionType.Text) {
+                  <ejs-textbox
+                    [value]="getQuestionValue(question.questionId)"
+                    (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
+                    [placeholder]="question.placeholderText || ''"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-textbox>
+                }
+
+                <!-- TextArea Input -->
+                @if (question.questionTypeId === QuestionType.TextArea) {
+                  <ejs-textbox
+                    [value]="getQuestionValue(question.questionId)"
+                    (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
+                    [placeholder]="question.placeholderText || ''"
+                    [multiline]="true"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-textbox>
+                }
+
+                <!-- Number Input -->
+                @if (question.questionTypeId === QuestionType.Number) {
+                  <ejs-numerictextbox
+                    [value]="getQuestionValue(question.questionId)"
+                    (change)="handleQuestionChange(question.questionId, $event.value)"
+                    [placeholder]="question.placeholderText || ''"
+                    [min]="question.minValue ?? undefined"
+                    [max]="question.maxValue ?? undefined"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-numerictextbox>
+                }
+
+                <!-- Email Input -->
+                @if (question.questionTypeId === QuestionType.Email) {
+                  <ejs-textbox
+                    [value]="getQuestionValue(question.questionId)"
+                    (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
+                    [placeholder]="question.placeholderText || 'email@example.com'"
+                    type="email"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-textbox>
+                }
+
+                <!-- Phone Input -->
+                @if (question.questionTypeId === QuestionType.Phone) {
+                  <ejs-textbox
+                    [value]="getQuestionValue(question.questionId)"
+                    (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
+                    [placeholder]="question.placeholderText || '(123) 456-7890'"
+                    type="tel"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-textbox>
+                }
+
+                <!-- Date Picker -->
+                @if (question.questionTypeId === QuestionType.Date) {
+                  <ejs-datepicker
+                    [value]="getQuestionValue(question.questionId)"
+                    (change)="handleQuestionChange(question.questionId, $event.value)"
+                    [placeholder]="question.placeholderText || 'Select date'"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-datepicker>
+                }
+
+                <!-- Time Picker -->
+                @if (question.questionTypeId === QuestionType.Time) {
+                  <ejs-timepicker
+                    [value]="getQuestionValue(question.questionId)"
+                    (change)="handleQuestionChange(question.questionId, $event.value)"
+                    [placeholder]="question.placeholderText || 'Select time'"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-timepicker>
+                }
+
+                <!-- DateTime Picker -->
+                @if (question.questionTypeId === QuestionType.DateTime) {
+                  <ejs-datetimepicker
+                    [value]="getQuestionValue(question.questionId)"
+                    (change)="handleQuestionChange(question.questionId, $event.value)"
+                    [placeholder]="question.placeholderText || 'Select date and time'"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-datetimepicker>
+                }
+
+                <!-- Radio Buttons -->
+                @if (question.questionTypeId === QuestionType.Radio) {
+                  <div class="options-container">
+                    @for (option of question.options; track option.optionId) {
+                      <div class="option-item">
+                        <ejs-radiobutton
+                          [label]="option.optionText"
+                          [name]="question.questionId"
+                          [value]="option.optionValue || option.optionText"
+                          [checked]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
+                          (change)="handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
+                          [disabled]="readonly">
+                        </ejs-radiobutton>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Checkboxes -->
+                @if (question.questionTypeId === QuestionType.Checkbox) {
+                  <div class="options-container">
+                    @for (option of question.options; track option.optionId) {
+                      <div class="option-item">
+                        <ejs-checkbox
+                          [label]="option.optionText"
+                          [value]="option.optionValue || option.optionText"
+                          [checked]="isCheckboxSelected(question.questionId, option.optionValue || option.optionText)"
+                          (change)="handleCheckboxChange(question.questionId, option.optionValue || option.optionText, $event.checked)"
+                          [disabled]="readonly">
+                        </ejs-checkbox>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Dropdown -->
+                @if (question.questionTypeId === QuestionType.Dropdown) {
+                  <ejs-dropdownlist
+                    [dataSource]="question.options"
+                    [fields]="getDropdownFields()"
+                    [value]="getQuestionValue(question.questionId)"
+                    (change)="handleQuestionChange(question.questionId, $event.value)"
+                    [placeholder]="question.placeholderText || 'Select an option'"
+                    [readonly]="readonly"
+                    [enabled]="!readonly"
+                    cssClass="form-control">
+                  </ejs-dropdownlist>
+                }
+
+                <!-- Slider -->
+                @if (question.questionTypeId === QuestionType.Slider) {
+                  <div class="slider-container">
+                    <input
+                      type="range"
+                      [value]="getQuestionValue(question.questionId) || question.minValue || 0"
+                      (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
+                      [min]="question.minValue || 0"
+                      [max]="question.maxValue || 100"
+                      [disabled]="readonly"
+                      class="form-slider">
+                    <span class="slider-value">{{ getQuestionValue(question.questionId) || question.minValue || 0 }}</span>
+                  </div>
+                }
+
+                <!-- Rating -->
+                @if (question.questionTypeId === QuestionType.Rating) {
+                  <div class="rating-container">
+                    @for (option of question.options; track option.optionId) {
+                      <button
+                        type="button"
+                        class="rating-option"
+                        [class.selected]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
+                        (click)="!readonly && handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
+                        [disabled]="readonly">
+                        {{ option.optionText }}
+                      </button>
+                    }
+                  </div>
+                }
+
+                <!-- Error Message -->
+                @if (getError(question.questionId)) {
+                  <div class="error-message">{{ getError(question.questionId) }}</div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (!readonly) {
+    <div class="form-actions">
+      <button class="submit-button" (click)="handleSubmit()">
+        Submit Form
+      </button>
+    </div>
+  }
+</div>

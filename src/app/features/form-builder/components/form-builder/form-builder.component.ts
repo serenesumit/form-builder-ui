@@ -149,8 +149,36 @@ export class FormBuilderComponent implements OnInit {
   }
 
   onPreview(): void {
-    // TODO: Implement preview functionality
-    alert('Preview functionality coming soon!');
+    const metadata = this.store.metadata();
+    const sections = this.store.sections();
+
+    // Validate that form has basic data
+    if (!metadata.code || !metadata.name) {
+      alert('Please fill in form code and name before previewing.');
+      this.openMetadataModal();
+      return;
+    }
+
+    if (sections.length === 0) {
+      alert('Please add at least one section to the form before previewing.');
+      return;
+    }
+
+    const hasQuestions = sections.some(s => s.questions.length > 0);
+    if (!hasQuestions) {
+      alert('Please add at least one question to the form before previewing.');
+      return;
+    }
+
+    // Navigate to preview page
+    const id = this.definitionId();
+    if (id) {
+      // If editing existing form, navigate to preview by definition ID
+      this.router.navigate(['/forms/preview', id]);
+    } else {
+      // If creating new form, show alert that form must be saved first
+      alert('Please save the form first before previewing. The preview feature requires a saved form.');
+    }
   }
 
   onCancel(): void {

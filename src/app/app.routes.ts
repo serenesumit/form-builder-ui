@@ -57,6 +57,20 @@ export const routes: Routes = [
           import('./features/form-builder/components/form-editor/form-editor.component').then(
             m => m.FormEditorComponent
           )
+      },
+      {
+        path: 'preview/:id',
+        loadComponent: () =>
+          import('./features/form-builder/pages/form-preview-page/form-preview-page.component').then(
+            m => m.FormPreviewPageComponent
+          )
+      },
+      {
+        path: 'preview/version/:versionId',
+        loadComponent: () =>
+          import('./features/form-builder/pages/form-preview-page/form-preview-page.component').then(
+            m => m.FormPreviewPageComponent
+          )
       }
     ]
   },

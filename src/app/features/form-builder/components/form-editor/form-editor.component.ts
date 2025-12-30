@@ -120,8 +120,16 @@ export class FormEditorComponent implements OnInit {
       alert('No form to preview');
       return;
     }
-    // Switch to preview tab
-    this.selectedTabIndex.set(2);
+
+    // Navigate to preview page
+    const id = this.definitionId();
+    if (id) {
+      // If editing existing form, navigate to preview by definition ID
+      this.router.navigate(['/forms/preview', id]);
+    } else {
+      // If creating new form, show alert that form must be saved first
+      alert('Please save the form first before previewing. The preview feature requires a saved form.');
+    }
   }
 
   onTabSelected(event: SelectEventArgs): void {
