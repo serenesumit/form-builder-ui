@@ -356,20 +356,104 @@ export class FormBuilderService {
    * Convert DTO to Request format (for editing loaded forms)
    */
   private convertDtoToRequest(dto: FormBuilderDto): SaveFormRequest {
-    // This is a simplified conversion - in real implementation,
-    // you would need to fetch the full form structure with sections
-    // For now, returning a basic structure
+    // Helper function to convert a single question
+    const convertQuestion = (q: any, qIndex: number): FormQuestionRequest => ({
+      questionId: q.questionId,
+      questionCode: q.questionCode,
+      questionText: q.questionText,
+      questionTypeId: q.questionTypeId,
+      helpText: q.helpText,
+      isRequired: q.isRequired ?? false,
+      // Handle both sortOrder and displayOrder field names
+      displayOrder: q.sortOrder ?? q.displayOrder ?? qIndex,
+      isActive: true,
+      backgroundColor: q.backgroundColor,
+      borderColor: q.borderColor,
+      height: q.height ?? null,
+      placeholderText: q.placeholderText,
+      defaultValue: q.defaultValue,
+      isPhi: q.isPHI ?? false,
+      cptCode: q.cptCode,
+      loincCode: q.loincCode,
+      snomedCode: q.snomedCode,
+      isCalculated: q.isCalculated ?? false,
+      calculationFormula: q.calculationExpression,
+      minValue: q.minValue ?? null,
+      maxValue: q.maxValue ?? null,
+      minLength: q.minLength ?? null,
+      maxLength: q.maxLength ?? null,
+      regexPattern: q.regexPattern,
+      regexErrorMessage: q.regexErrorMessage,
+      options: q.options?.map((opt: any, optIndex: number) => ({
+        optionId: opt.optionId,
+        optionText: opt.optionText,
+        optionValue: opt.optionValue ?? opt.optionText,
+        // Handle both numericScore and score field names
+        numericScore: opt.numericScore ?? opt.score ?? null,
+        // Handle both sortOrder and displayOrder field names
+        displayOrder: opt.sortOrder ?? opt.displayOrder ?? optIndex
+      })) ?? [],
+      conditionalRules: q.conditionalRules?.map((rule: any) => ({
+        ruleId: rule.ruleId,
+        ruleGroupId: null,
+        sourceQuestionId: rule.sourceQuestionId ?? null,
+        operator: rule.operator as any,
+        compareValue: rule.compareValue,
+        compareToQuestionId: rule.compareToQuestionId ?? null,
+        actionType: rule.actionType as any,
+        joinType: undefined,
+        sortOrder: rule.sortOrder
+      })) ?? []
+    });
+
+    // Determine sections - handle both sectioned and flat question formats
+    let sections: FormBuilderSectionRequest[];
+
+    if (dto.sections && dto.sections.length > 0) {
+      // Standard format: questions are nested inside sections
+      sections = dto.sections.map((section, sIndex) => ({
+        sectionId: section.sectionId,
+        sectionName: section.sectionName,
+        sectionDescription: section.sectionDescription,
+        sortOrder: section.sortOrder ?? sIndex,
+        isRepeatable: section.isRepeatable ?? false,
+        minRepeat: section.minRepeat ?? 1,
+        maxRepeat: section.maxRepeat ?? null,
+        progressIndicator: section.progressIndicator ?? true,
+        isCollapsible: section.isCollapsible ?? false,
+        questions: section.questions?.map((q, qIndex) => convertQuestion(q, qIndex)) ?? []
+      }));
+    } else if (dto.questions && dto.questions.length > 0) {
+      // Legacy format: questions are at root level without sections
+      // Create a default section and put all questions in it
+      sections = [{
+        sectionId: null,
+        sectionName: 'Default Section',
+        sectionDescription: '',
+        sortOrder: 0,
+        isRepeatable: false,
+        minRepeat: 1,
+        maxRepeat: null,
+        progressIndicator: true,
+        isCollapsible: false,
+        questions: dto.questions.map((q, qIndex) => convertQuestion(q, qIndex))
+      }];
+    } else {
+      // No questions or sections
+      sections = [];
+    }
+
     return {
       definitionId: dto.definitionId,
       code: dto.code,
       name: dto.name,
       description: dto.description,
       category: dto.category,
-      isStandard: dto.isStandard,
+      isStandard: dto.isStandard ?? false,
       isActive: true,
       allowVersioning: true,
       changeNotes: '',
-      sections: [] // Would need additional API call to get full section details
+      sections
     };
   }
 }

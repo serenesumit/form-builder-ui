@@ -111,10 +111,25 @@ export class FormBuilderStoreService {
   }
 
   loadFormFromApi(formData: FormBuilderDto): void {
-    // Convert API response (with sections) to store format
-    const sections: CanvasSection[] = formData.sections?.length > 0
-      ? formData.sections.map((section, sectionIndex) => this.convertApiSectionToCanvas(section, sectionIndex))
-      : [createDefaultSection(0)];
+    let sections: CanvasSection[];
+
+    if (formData.sections && formData.sections.length > 0) {
+      // Standard format: questions are nested inside sections
+      sections = formData.sections.map((section, sectionIndex) => 
+        this.convertApiSectionToCanvas(section, sectionIndex)
+      );
+    } else if (formData.questions && formData.questions.length > 0) {
+      // Legacy format: questions are at root level without sections
+      // Create a default section and put all questions in it
+      const defaultSection = createDefaultSection(0);
+      defaultSection.questions = formData.questions.map((q, qIndex) => 
+        this.convertApiQuestionToCanvas(q, qIndex)
+      );
+      sections = [defaultSection];
+    } else {
+      // No questions or sections, create empty default section
+      sections = [createDefaultSection(0)];
+    }
 
     this.state.set({
       ...initialState,
@@ -154,7 +169,8 @@ export class FormBuilderStoreService {
       questionTypeId: apiQuestion.questionTypeId,
       helpText: apiQuestion.helpText || '',
       isRequired: apiQuestion.isRequired,
-      displayOrder: apiQuestion.sortOrder ?? index,
+      // Handle both sortOrder and displayOrder field names
+      displayOrder: apiQuestion.sortOrder ?? apiQuestion.displayOrder ?? index,
       isActive: true,
       backgroundColor: apiQuestion.backgroundColor,
       borderColor: apiQuestion.borderColor,
@@ -176,8 +192,10 @@ export class FormBuilderStoreService {
         id: opt.optionId || generateId(),
         text: opt.optionText,
         value: opt.optionValue || opt.optionText,
-        displayOrder: opt.sortOrder ?? optIndex,
-        numericScore: opt.numericScore ?? undefined
+        // Handle both sortOrder and displayOrder field names
+        displayOrder: opt.sortOrder ?? opt.displayOrder ?? optIndex,
+        // Handle both numericScore and score field names
+        numericScore: opt.numericScore ?? opt.score ?? undefined
       })) || [],
       conditionalRules: apiQuestion.conditionalRules?.map(rule => ({
         id: rule.ruleId || generateId(),

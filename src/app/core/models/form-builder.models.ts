@@ -99,13 +99,16 @@ export interface FormListItemDto {
 export interface FormBuilderDto {
   tenantId?: string;
   definitionId: string;
+  latestVersionId?: string;
   versionId?: string;
   code: string;
   name: string;
   description?: string;
   category?: string;
   isStandard?: boolean;
-  sections: FormBuilderSectionDto[];
+  sections?: FormBuilderSectionDto[];
+  // Legacy format: questions at root level without sections
+  questions?: FormBuilderQuestionDto[];
 }
 
 export interface FormBuilderSectionDto {
@@ -130,7 +133,8 @@ export interface FormBuilderQuestionDto {
   questionTypeName?: string;
   helpText?: string;
   isRequired: boolean;
-  sortOrder: number;
+  sortOrder?: number;
+  displayOrder?: number; // Alternative field name used by some API responses
   backgroundColor?: string;
   borderColor?: string;
   height?: number | null;
@@ -161,7 +165,9 @@ export interface FormBuilderOptionDto {
   optionText: string;
   optionValue?: string;
   numericScore?: number | null;
-  sortOrder: number;
+  score?: number | null; // Alternative field name used by some API responses
+  sortOrder?: number;
+  displayOrder?: number; // Alternative field name used by some API responses
 }
 
 export interface FormBuilderConditionalRuleDto {
