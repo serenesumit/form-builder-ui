@@ -162,6 +162,7 @@ export interface FormMetadata {
   description?: string;
   category?: string;
   isStandard: boolean;
+  allowVersioning: boolean;
 }
 
 export interface FormBuilderStoreState {

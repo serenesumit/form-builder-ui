@@ -73,6 +73,14 @@
 
       <!-- Center - Form Canvas -->
       <section class="canvas-panel">
+        <div class="canvas-toolbar">
+          <ejs-checkbox
+            [(ngModel)]="allowVersioning"
+            (ngModelChange)="onAllowVersioningChange()"
+            label="Create New Version">
+          </ejs-checkbox>
+          <span class="toolbar-hint">When enabled, saving will create a new version instead of updating the existing draft</span>
+        </div>
         <app-form-canvas></app-form-canvas>
       </section>
 
@@ -97,58 +105,70 @@
         <div class="modal-body">
           <div class="form-group">
             <label for="formCode">Form Code <span class="required">*</span></label>
-            <input 
-              type="text" 
+            <ejs-textbox
               id="formCode"
               [(ngModel)]="formCode"
-              placeholder="e.g., PHQ9_V1">
+              placeholder="e.g., PHQ9_V1"
+              floatLabelType="Never">
+            </ejs-textbox>
             <span class="field-hint">Unique identifier for this form</span>
           </div>
 
           <div class="form-group">
             <label for="formName">Form Name <span class="required">*</span></label>
-            <input 
-              type="text" 
+            <ejs-textbox
               id="formName"
               [(ngModel)]="formName"
-              placeholder="e.g., Patient Health Questionnaire-9">
+              placeholder="e.g., Patient Health Questionnaire-9"
+              floatLabelType="Never">
+            </ejs-textbox>
           </div>
 
           <div class="form-group">
             <label for="formDesc">Description</label>
-            <textarea 
+            <ejs-textbox
               id="formDesc"
               [(ngModel)]="formDescription"
               placeholder="Describe the purpose of this form"
-              rows="3"></textarea>
+              floatLabelType="Never"
+              [multiline]="true">
+            </ejs-textbox>
           </div>
 
           <div class="form-group">
             <label for="formCategory">Category</label>
-            <input 
-              type="text" 
+            <ejs-textbox
               id="formCategory"
               [(ngModel)]="formCategory"
-              placeholder="e.g., MENTAL_HEALTH, INTAKE">
+              placeholder="e.g., MENTAL_HEALTH, INTAKE"
+              floatLabelType="Never">
+            </ejs-textbox>
           </div>
 
-          <div class="toggle-group">
-            <label class="toggle-label">
-              <input type="checkbox" [(ngModel)]="isStandard">
-              <span class="toggle-text">
-                <span class="toggle-title">Standard Form Template</span>
-                <span class="toggle-desc">This is a standardized form template</span>
-              </span>
-            </label>
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="isStandard"
+              label="Standard Form Template">
+            </ejs-checkbox>
+            <span class="checkbox-hint">This is a standardized form template</span>
+          </div>
+
+          <div class="checkbox-group">
+            <ejs-checkbox
+              [(ngModel)]="allowVersioning"
+              label="Create New Version">
+            </ejs-checkbox>
+            <span class="checkbox-hint">When enabled, saving will create a new version instead of updating the existing draft</span>
           </div>
         </div>
         
         <div class="modal-footer">
-          <button class="modal-btn secondary" (click)="closeMetadataModal()" type="button">
+          <button ejs-button (click)="closeMetadataModal()" type="button">
             Cancel
           </button>
           <button 
-            class="modal-btn primary" 
+            ejs-button
+            cssClass="e-primary"
             (click)="saveMetadata()"
             [disabled]="!formCode || !formName"
             type="button">

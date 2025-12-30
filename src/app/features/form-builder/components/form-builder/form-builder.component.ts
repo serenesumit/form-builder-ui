@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { FormBuilderStoreService } from '../../services/form-builder-store.service';
 import { FormBuilderApiService } from '@core/services/form-builder-api.service';
 import { ComponentPaletteComponent } from '../component-palette/component-palette.component';
@@ -16,6 +18,9 @@ import { PropertiesPanelComponent } from '../properties-panel/properties-panel.c
     CommonModule,
     FormsModule,
     DragDropModule,
+    TextBoxModule,
+    ButtonModule,
+    CheckBoxModule,
     ComponentPaletteComponent,
     FormCanvasComponent,
     PropertiesPanelComponent
@@ -38,6 +43,7 @@ export class FormBuilderComponent implements OnInit {
   formDescription = '';
   formCategory = '';
   isStandard = false;
+  allowVersioning = false;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -81,6 +87,7 @@ export class FormBuilderComponent implements OnInit {
     this.formDescription = metadata.description || '';
     this.formCategory = metadata.category || '';
     this.isStandard = metadata.isStandard;
+    this.allowVersioning = metadata.allowVersioning;
   }
 
   openMetadataModal(): void {
@@ -98,9 +105,16 @@ export class FormBuilderComponent implements OnInit {
       name: this.formName,
       description: this.formDescription,
       category: this.formCategory,
-      isStandard: this.isStandard
+      isStandard: this.isStandard,
+      allowVersioning: this.allowVersioning
     });
     this.showMetadataModal.set(false);
+  }
+
+  onAllowVersioningChange(): void {
+    this.store.updateMetadata({
+      allowVersioning: this.allowVersioning
+    });
   }
 
   onSave(): void {

@@ -1,5 +1,12 @@
 /* Global Styles */
 
+/* Hide Syncfusion license warning banner */
+.e-license-banner,
+.e-license {
+  display: none !important;
+  position:none !important;
+}
+
 * {
   box-sizing: border-box;
 }

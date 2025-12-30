@@ -30,7 +30,8 @@ const initialState: FormBuilderStoreState = {
     name: '',
     description: '',
     category: '',
-    isStandard: false
+    isStandard: false,
+    allowVersioning: false
   },
   sections: [],
   selection: {
@@ -138,7 +139,8 @@ export class FormBuilderStoreService {
         name: formData.name,
         description: formData.description || '',
         category: formData.category || '',
-        isStandard: formData.isStandard || false
+        isStandard: formData.isStandard || false,
+        allowVersioning: false // Default to false for existing forms (update mode)
       },
       sections,
       isDirty: false
@@ -650,6 +652,7 @@ export class FormBuilderStoreService {
       description: state.metadata.description,
       category: state.metadata.category,
       isStandard: state.metadata.isStandard,
+      allowVersioning: state.metadata.allowVersioning,
       sections: state.sections.map((section, index) => this.convertSection(section, index))
     };
   }

@@ -262,6 +262,51 @@
 .canvas-panel {
   flex: 1;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, #1a1f2e 0%, #151922 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  
+  .toolbar-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  // Syncfusion checkbox styling for dark background
+  ::ng-deep .e-checkbox-wrapper {
+    .e-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .e-frame {
+      border-color: rgba(255, 255, 255, 0.3);
+      background-color: transparent;
+      
+      &.e-check {
+        background-color: #6366f1;
+        border-color: #6366f1;
+      }
+    }
+    
+    &:hover .e-frame {
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.canvas-panel app-form-canvas {
+  flex: 1;
+  overflow: hidden;
 }
 
 .properties-panel-container {
@@ -349,7 +394,7 @@
 
 .modal-body {
   padding: 24px;
-  max-height: 60vh;
+  max-height: 70vh;
   overflow-y: auto;
 }
 
@@ -492,6 +537,70 @@
       font-size: 12px;
       color: #64748b;
       margin-top: 2px;
+    }
+  }
+}
+
+// Syncfusion checkbox group styling
+.checkbox-group {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: #f8fafc;
+  border-radius: 10px;
+  
+  .checkbox-hint {
+    display: block;
+    margin-top: 6px;
+    margin-left: 26px;
+    font-size: 12px;
+    color: #64748b;
+  }
+  
+  // Syncfusion checkbox overrides
+  ::ng-deep .e-checkbox-wrapper {
+    .e-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e293b;
+    }
+    
+    .e-frame {
+      border-color: #cbd5e1;
+      background-color: #fff;
+      
+      &.e-check {
+        background-color: #6366f1;
+        border-color: #6366f1;
+      }
+    }
+  }
+}
+
+// Syncfusion textbox overrides for modal
+.modal-body {
+  ::ng-deep .e-input-group {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    
+    &.e-input-focus {
+      background: #fff;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .e-input {
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #1e293b;
+      
+      &::placeholder {
+        color: #94a3b8;
+      }
+    }
+    
+    &.e-multi-line-input {
+      min-height: 80px;
     }
   }
 }
