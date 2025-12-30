@@ -82,6 +82,7 @@
               cdkDropList
               [id]="'section-' + sectionIndex"
               [cdkDropListData]="section.questions"
+              [cdkDropListConnectedTo]="getAllDropListIds()"
               (cdkDropListDropped)="onQuestionDrop($event, sectionIndex)">
               
               @if (section.questions.length === 0) {
