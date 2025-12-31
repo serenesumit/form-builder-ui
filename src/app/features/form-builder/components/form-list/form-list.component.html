@@ -58,6 +58,13 @@
             <div class="action-buttons" (click)="$event.stopPropagation()">
               <button
                 ejs-button
+                (click)="onFillForm(data.definitionId); $event.stopPropagation()"
+                cssClass="e-small e-primary"
+                iconCss="e-icons e-file-new"
+                title="Fill Form">
+              </button>
+              <button
+                ejs-button
                 (click)="onView(data.definitionId); $event.stopPropagation()"
                 cssClass="e-small e-info"
                 iconCss="e-icons e-eye"

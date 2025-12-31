@@ -1,0 +1,189 @@
+<div class="form-renderer-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading form...</p>
+    </div>
+  } @else {
+    <div class="form-header">
+      <div class="form-title">
+        <h1>{{ formData()?.formTitle || 'Form' }}</h1>
+        @if (formData()?.description) {
+          <p class="form-description">{{ formData().description }}</p>
+        }
+      </div>
+      <div class="progress-indicator">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progress()"></div>
+        </div>
+        <span class="progress-text">{{ progress() }}% Complete</span>
+      </div>
+    </div>
+
+    <div class="form-content">
+      @for (section of sections(); track section.id) {
+        <div class="form-section">
+          <div class="section-header">
+            <h2>{{ section.sectionTitle }}</h2>
+            @if (section.description) {
+              <p class="section-description">{{ section.description }}</p>
+            }
+          </div>
+
+          <div class="section-questions">
+            @for (question of section.questions; track question.id) {
+              @if (isQuestionVisible(question)) {
+                <div class="question-item" [class.required]="question.isRequired">
+                  <label class="question-label">
+                    {{ question.questionText }}
+                    @if (question.isRequired) {
+                      <span class="required-indicator">*</span>
+                    }
+                  </label>
+
+                  @if (question.helpText) {
+                    <p class="help-text">{{ question.helpText }}</p>
+                  }
+
+                  <div class="question-input">
+                    @switch (question.questionType) {
+                      @case ('TEXT') {
+                        <input
+                          type="text"
+                          class="form-input"
+                          [value]="getAnswer(question.id) || ''"
+                          (input)="updateAnswer(question.id, $any($event.target).value)"
+                          [required]="question.isRequired"
+                        />
+                      }
+                      @case ('TEXTAREA') {
+                        <textarea
+                          class="form-textarea"
+                          rows="4"
+                          [value]="getAnswer(question.id) || ''"
+                          (input)="updateAnswer(question.id, $any($event.target).value)"
+                          [required]="question.isRequired"
+                        ></textarea>
+                      }
+                      @case ('NUMBER') {
+                        <input
+                          type="number"
+                          class="form-input"
+                          [value]="getAnswer(question.id) || ''"
+                          (input)="updateAnswer(question.id, $any($event.target).value)"
+                          [required]="question.isRequired"
+                        />
+                      }
+                      @case ('DATE') {
+                        <input
+                          type="date"
+                          class="form-input"
+                          [value]="getAnswer(question.id) || ''"
+                          (input)="updateAnswer(question.id, $any($event.target).value)"
+                          [required]="question.isRequired"
+                        />
+                      }
+                      @case ('SINGLE_CHOICE') {
+                        <div class="radio-group">
+                          @for (option of question.options; track option.id) {
+                            <label class="radio-option">
+                              <input
+                                type="radio"
+                                [name]="question.id"
+                                [value]="option.optionValue"
+                                [checked]="getAnswer(question.id) === option.optionValue"
+                                (change)="updateAnswer(question.id, option.optionValue, option.id)"
+                              />
+                              <span>{{ option.optionText }}</span>
+                            </label>
+                          }
+                        </div>
+                      }
+                      @case ('MULTIPLE_CHOICE') {
+                        <div class="checkbox-group">
+                          @for (option of question.options; track option.id) {
+                            <label class="checkbox-option">
+                              <input
+                                type="checkbox"
+                                [value]="option.optionValue"
+                                (change)="updateAnswer(question.id, option.optionValue, option.id)"
+                              />
+                              <span>{{ option.optionText }}</span>
+                            </label>
+                          }
+                        </div>
+                      }
+                      @case ('DROPDOWN') {
+                        <select
+                          class="form-select"
+                          [value]="getAnswer(question.id) || ''"
+                          (change)="updateAnswer(question.id, $any($event.target).value)"
+                          [required]="question.isRequired"
+                        >
+                          <option value="">Select an option</option>
+                          @for (option of question.options; track option.id) {
+                            <option [value]="option.optionValue">{{ option.optionText }}</option>
+                          }
+                        </select>
+                      }
+                      @case ('MATRIX') {
+                        <div class="matrix-table">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th></th>
+                                @for (col of question.matrixCols; track col.id) {
+                                  <th>{{ col.colText }}</th>
+                                }
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @for (row of question.matrixRows; track row.id) {
+                                <tr>
+                                  <td class="row-label">{{ row.rowText }}</td>
+                                  @for (col of question.matrixCols; track col.id) {
+                                    <td>
+                                      <input
+                                        type="radio"
+                                        [name]="question.id + '_' + row.id"
+                                        (change)="updateMatrixAnswer(question.id, row.id, col.id, 'selected')"
+                                        [checked]="getMatrixAnswer(question.id, row.id, col.id) === 'selected'"
+                                      />
+                                    </td>
+                                  }
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="saveDraft()"
+        [disabled]="saving()"
+      >
+        {{ saving() ? 'Saving...' : 'Save Draft' }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="submitForm()"
+        [disabled]="saving()"
+      >
+        {{ saving() ? 'Submitting...' : 'Submit Form' }}
+      </button>
+    </div>
+  }
+</div>

@@ -64,6 +64,26 @@ export class FormListComponent implements OnInit {
     this.router.navigate(['/forms/preview', definitionId]);
   }
 
+  onFillForm(definitionId: string): void {
+    // For demo purposes, using placeholder values
+    // In a real app, these would come from the current user/patient context
+    const tenantId = '11111111-1111-1111-1111-111111111111'; // Use the same tenant ID as environment
+    const patientId = '00000000-0000-0000-0000-000000000002'; // Replace with actual patient ID
+
+    // First, get the form to find its latest version ID
+    this.apiService.getFormByDefinitionId(definitionId).subscribe({
+      next: (form: any) => {
+        // Use the versionId from the form data
+        const versionId = form.versionId || definitionId;
+        this.router.navigate(['/forms/fill', tenantId, versionId, patientId]);
+      },
+      error: (error) => {
+        console.error('Error loading form for filling:', error);
+        alert('Failed to load form. Please try again.');
+      }
+    });
+  }
+
   onDelete(definitionId: string): void {
     // Would implement delete functionality when API supports it
     if (confirm('Are you sure you want to delete this form?')) {
