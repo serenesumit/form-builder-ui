@@ -661,7 +661,7 @@ export class FormBuilderStoreService {
 
   private convertSection(section: CanvasSection, index: number): FormBuilderSectionRequest {
     return {
-      sectionId: section.id.includes('-') ? null : section.id,
+      sectionId: section.id,  // Send as-is - backend matches existing or creates new
       sectionName: section.name,
       sectionDescription: section.description,
       sortOrder: index,
@@ -676,7 +676,7 @@ export class FormBuilderStoreService {
 
   private convertQuestion(question: CanvasQuestion, index: number): FormQuestionRequest {
     return {
-      questionId: question.id.includes('-') ? null : question.id,
+      questionId: question.id,  // Send as-is - backend matches existing or creates new
       questionCode: question.questionCode,
       questionText: question.questionText,
       questionTypeId: question.questionTypeId,
@@ -711,12 +711,12 @@ export class FormBuilderStoreService {
 
   private convertConditionalRule(rule: CanvasConditionalRule, index: number): FormBuilderConditionalRuleRequest {
     return {
-      ruleId: rule.id.includes('-') ? null : rule.id,
-      ruleGroupId: rule.ruleGroupId?.includes('-') ? null : rule.ruleGroupId ?? null,
-      sourceQuestionId: !rule.sourceQuestionId || rule.sourceQuestionId.includes('-') ? null : rule.sourceQuestionId,
+      ruleId: rule.id,  // Send the ID as-is - backend will handle new vs existing
+      ruleGroupId: rule.ruleGroupId ?? null,
+      sourceQuestionId: rule.sourceQuestionId || null,
       operator: rule.operator,
       compareValue: rule.compareValue,
-      compareToQuestionId: !rule.compareToQuestionId || rule.compareToQuestionId.includes('-') ? null : rule.compareToQuestionId,
+      compareToQuestionId: rule.compareToQuestionId || null,
       actionType: rule.actionType,
       joinType: rule.joinType,
       sortOrder: index
@@ -725,7 +725,7 @@ export class FormBuilderStoreService {
 
   private convertOption(option: CanvasQuestionOption, index: number): FormQuestionOptionRequest {
     return {
-      optionId: option.id.includes('-') ? null : option.id,
+      optionId: option.id,  // Send as-is - backend matches existing or creates new
       optionText: option.text,
       optionValue: option.value,
       numericScore: option.numericScore ?? null,
