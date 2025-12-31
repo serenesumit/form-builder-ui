@@ -1,9 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { FormBuilderStoreService } from '../../services/form-builder-store.service';
 import { SortableQuestionComponent } from '../sortable-question/sortable-question.component';
 import { CanvasSection, CanvasQuestion, PaletteItem } from '../../models/form-builder.types';
+
+type ViewMode = 'list' | 'tabs';
 
 @Component({
   selector: 'app-form-canvas',
@@ -14,6 +16,10 @@ import { CanvasSection, CanvasQuestion, PaletteItem } from '../../models/form-bu
 })
 export class FormCanvasComponent {
   readonly store = inject(FormBuilderStoreService);
+
+  // View mode: list (collapsible sections) or tabs
+  readonly viewMode = signal<ViewMode>('list');
+  readonly activeTabIndex = signal<number>(0);
 
   getDropListIds(): string[] {
     return this.store.sections().map((_, i) => `section-${i}`);
@@ -112,6 +118,33 @@ export class FormCanvasComponent {
   isSectionSelected(sectionIndex: number): boolean {
     const selection = this.store.selection();
     return selection.sectionIndex === sectionIndex && selection.questionIndex === null;
+  }
+
+  // View mode toggle
+  toggleViewMode(): void {
+    const current = this.viewMode();
+    this.viewMode.set(current === 'list' ? 'tabs' : 'list');
+
+    // If switching to tabs and no sections, stay on index 0
+    // Otherwise, switch to the first section
+    if (this.viewMode() === 'tabs' && this.store.sections().length > 0) {
+      this.activeTabIndex.set(0);
+    }
+  }
+
+  // Tab navigation
+  selectTab(index: number): void {
+    if (index >= 0 && index < this.store.sections().length) {
+      this.activeTabIndex.set(index);
+      // Auto-select the section when clicking its tab
+      this.store.selectSection(index);
+    }
+  }
+
+  getActiveSection(): CanvasSection | null {
+    const sections = this.store.sections();
+    const index = this.activeTabIndex();
+    return index >= 0 && index < sections.length ? sections[index] : null;
   }
 }
 
