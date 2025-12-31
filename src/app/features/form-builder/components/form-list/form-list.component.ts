@@ -61,7 +61,7 @@ export class FormListComponent implements OnInit {
   }
 
   onView(definitionId: string): void {
-    this.router.navigate(['/forms/view', definitionId]);
+    this.router.navigate(['/forms/preview', definitionId]);
   }
 
   onDelete(definitionId: string): void {
