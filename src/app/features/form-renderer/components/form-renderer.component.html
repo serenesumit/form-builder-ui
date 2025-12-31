@@ -7,10 +7,16 @@
   } @else {
     <div class="form-header">
       <div class="form-title">
-        <h1>{{ formData()?.formTitle || 'Form' }}</h1>
+        <h1>{{ formData()?.name || 'Form' }}</h1>
         @if (formData()?.description) {
           <p class="form-description">{{ formData().description }}</p>
         }
+      </div>
+      <div class="view-mode-toggle">
+        <button type="button" class="toggle-btn" (click)="toggleViewMode()">
+          <span class="toggle-icon">{{ viewMode() === 'single' ? '📑' : '📄' }}</span>
+          {{ viewMode() === 'single' ? 'Switch to Tabs View' : 'Switch to Single Page' }}
+        </button>
       </div>
       <div class="progress-indicator">
         <div class="progress-bar">
@@ -20,9 +26,26 @@
       </div>
     </div>
 
-    <div class="form-content">
-      @for (section of sections(); track section.id) {
-        <div class="form-section">
+    @if (viewMode() === 'tabs' && sections().length > 1) {
+      <div class="tabs-navigation">
+        <div class="tabs-list">
+          @for (section of sections(); track section.id; let i = $index) {
+            <button
+              type="button"
+              class="tab-button"
+              [class.active]="currentTabIndex() === i"
+              (click)="goToTab(i)">
+              {{ section.sectionTitle }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="form-content" [class.scrollable]="viewMode() === 'single'" [class.tabs-view]="viewMode() === 'tabs'">
+      @for (section of sections(); track section.id; let i = $index) {
+        @if (viewMode() === 'single' || i === currentTabIndex()) {
+          <div class="form-section">
           <div class="section-header">
             <h2>{{ section.sectionTitle }}</h2>
             @if (section.description) {
@@ -163,7 +186,27 @@
               }
             }
           </div>
+
+          @if (viewMode() === 'tabs') {
+            <div class="tab-navigation-buttons">
+              <button
+                type="button"
+                class="nav-btn nav-prev"
+                [disabled]="currentTabIndex() === 0"
+                (click)="previousTab()">
+                ← Previous
+              </button>
+              <button
+                type="button"
+                class="nav-btn nav-next"
+                [disabled]="currentTabIndex() === sections().length - 1"
+                (click)="nextTab()">
+                Next →
+              </button>
+            </div>
+          }
         </div>
+        }
       }
     </div>
 

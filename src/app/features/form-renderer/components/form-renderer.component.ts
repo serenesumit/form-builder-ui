@@ -72,6 +72,8 @@ export class FormRendererComponent implements OnInit {
   readonly answers = signal<Map<string, FormResponseAnswer>>(new Map());
   readonly loading = signal<boolean>(true);
   readonly saving = signal<boolean>(false);
+  readonly viewMode = signal<'single' | 'tabs'>('single'); // View mode: single page or tabs
+  readonly currentTabIndex = signal<number>(0); // Current active tab index
 
   readonly progress = computed(() => {
     const allQuestions = this.sections().flatMap(s => s.questions);
@@ -108,20 +110,38 @@ export class FormRendererComponent implements OnInit {
 
   private convertSections(sections: any[]): Section[] {
     return sections.map(section => ({
-      id: section.id,
-      sectionTitle: section.sectionTitle,
-      description: section.description,
-      questions: (section.questions || []).map((q: any) => ({
-        id: q.id,
-        questionText: q.questionText,
-        questionType: q.questionType,
-        isRequired: q.isRequired,
-        helpText: q.helpText,
-        options: q.options,
-        matrixRows: q.matrixRows,
-        matrixCols: q.matrixCols,
-        conditionalRules: q.conditionalRules
-      }))
+      id: section.sectionId,
+      sectionTitle: section.sectionName,
+      description: section.sectionDescription,
+      questions: (section.questions || []).map((q: any) => {
+        // Detect if question type is wrong based on having options
+        let questionType = q.questionType;
+        const hasOptions = q.options && q.options.length > 0;
+
+        // If question has options but type is not a choice type, auto-correct it
+        if (hasOptions && !['SINGLE_CHOICE', 'MULTIPLE_CHOICE', 'DROPDOWN'].includes(questionType)) {
+          // Default to SINGLE_CHOICE for questions with options
+          questionType = 'SINGLE_CHOICE';
+          console.warn(`Question "${q.questionText}" has type ${q.questionType} but has options. Auto-correcting to SINGLE_CHOICE.`);
+        }
+
+        return {
+          id: q.questionId,
+          questionText: q.questionText,
+          questionTypeId: q.questionTypeId,
+          questionType: questionType,
+          isRequired: q.isRequired,
+          helpText: q.helpText,
+          options: (q.options || []).map((opt: any) => ({
+            id: opt.optionId,
+            optionText: opt.optionText,
+            optionValue: opt.optionValue
+          })),
+          matrixRows: q.matrixRows,
+          matrixCols: q.matrixCols,
+          conditionalRules: q.conditionalRules
+        };
+      })
     }));
   }
 
@@ -188,6 +208,32 @@ export class FormRendererComponent implements OnInit {
           return true;
       }
     });
+  }
+
+  toggleViewMode(): void {
+    const newMode = this.viewMode() === 'single' ? 'tabs' : 'single';
+    this.viewMode.set(newMode);
+    if (newMode === 'tabs') {
+      this.currentTabIndex.set(0);
+    }
+  }
+
+  goToTab(index: number): void {
+    this.currentTabIndex.set(index);
+  }
+
+  nextTab(): void {
+    const nextIndex = this.currentTabIndex() + 1;
+    if (nextIndex < this.sections().length) {
+      this.currentTabIndex.set(nextIndex);
+    }
+  }
+
+  previousTab(): void {
+    const prevIndex = this.currentTabIndex() - 1;
+    if (prevIndex >= 0) {
+      this.currentTabIndex.set(prevIndex);
+    }
   }
 
   saveDraft(): void {
