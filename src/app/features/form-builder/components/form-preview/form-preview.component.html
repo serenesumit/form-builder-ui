@@ -186,15 +186,17 @@
                 <!-- Slider -->
                 @if (question.questionTypeId === QuestionType.Slider) {
                   <div class="slider-container">
-                    <input
-                      type="range"
+                    <ejs-slider
                       [value]="getQuestionValue(question.questionId) || question.minValue || 0"
-                      (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
+                      (change)="handleQuestionChange(question.questionId, $event.value)"
                       [min]="question.minValue || 0"
                       [max]="question.maxValue || 100"
-                      [disabled]="readonly"
-                      class="form-slider">
-                    <span class="slider-value">{{ getQuestionValue(question.questionId) || question.minValue || 0 }}</span>
+                      [readonly]="readonly"
+                      [enabled]="!readonly"
+                      [showButtons]="true"
+                      [tooltip]="{isVisible: true, placement: 'Before', showOn: 'Always'}"
+                      cssClass="form-control">
+                    </ejs-slider>
                   </div>
                 }
 
@@ -202,14 +204,15 @@
                 @if (question.questionTypeId === QuestionType.Rating) {
                   <div class="rating-container">
                     @for (option of question.options; track option.optionId) {
-                      <button
-                        type="button"
-                        class="rating-option"
-                        [class.selected]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
-                        (click)="!readonly && handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
-                        [disabled]="readonly">
-                        {{ option.optionText }}
-                      </button>
+                      <ejs-radiobutton
+                        [label]="option.optionText"
+                        [name]="question.questionId + '_rating'"
+                        [value]="option.optionValue || option.optionText"
+                        [checked]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
+                        (change)="handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
+                        [disabled]="readonly"
+                        cssClass="e-rating-option">
+                      </ejs-radiobutton>
                     }
                   </div>
                 }
