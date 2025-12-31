@@ -1,10 +1,10 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { TextBoxModule, NumericTextBoxModule, SliderModule } from '@syncfusion/ej2-angular-inputs';
 import { ButtonModule, CheckBoxModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import {
   FormBuilderSectionDto,
   FormBuilderQuestionDto,
@@ -25,13 +25,15 @@ import {
     FormsModule,
     TextBoxModule,
     NumericTextBoxModule,
+    SliderModule,
     ButtonModule,
     CheckBoxModule,
     RadioButtonModule,
     DatePickerModule,
     TimePickerModule,
     DateTimePickerModule,
-    DropDownListModule
+    DropDownListModule,
+    MultiSelectModule
   ],
   templateUrl: './form-preview.component.html',
   styleUrls: ['./form-preview.component.scss']

@@ -175,15 +175,16 @@
 
                   <!-- Slider -->
                   @if (question.questionTypeId === QuestionType.Slider) {
-                    <input
-                      type="range"
+                    <ejs-slider
                       [id]="getQuestionId($index, $index)"
                       [min]="question.minValue ?? 0"
                       [max]="question.maxValue ?? 100"
                       [value]="getQuestionValue(getQuestionId($index, $index)) ?? question.defaultValue ?? 0"
-                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
-                      class="slider">
-                    <span class="slider-value">{{ getQuestionValue(getQuestionId($index, $index)) ?? question.defaultValue ?? 0 }}</span>
+                      (change)="setQuestionValue(getQuestionId($index, $index), $event.value)"
+                      [showButtons]="true"
+                      [tooltip]="{isVisible: true, placement: 'Before', showOn: 'Always'}"
+                      floatLabelType="Never">
+                    </ejs-slider>
                   }
                 </div>
               </div>
