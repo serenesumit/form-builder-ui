@@ -5,6 +5,7 @@ import {
   CanvasSection,
   CanvasQuestion,
   CanvasQuestionOption,
+  CanvasConditionalRule,
   FormBuilderSelection,
   FormBuilderDragState,
   DragItem,
@@ -19,6 +20,7 @@ import {
   FormBuilderSectionRequest,
   FormQuestionRequest,
   FormQuestionOptionRequest,
+  FormBuilderConditionalRuleRequest,
   FormBuilderDto,
   FormBuilderSectionDto,
   FormBuilderQuestionDto
@@ -700,7 +702,24 @@ export class FormBuilderStoreService {
       regexPattern: question.regexPattern,
       regexErrorMessage: question.regexErrorMessage,
       options: question.options.map((opt, i) => this.convertOption(opt, i)),
-      conditionalRules: []
+      conditionalRules: question.conditionalRules.map((rule, i) => this.convertConditionalRule(rule, i)),
+      validationRules: [], // TODO: Implement when validation rules UI is added
+      rows: [], // TODO: Implement when matrix question UI is added
+      cols: []  // TODO: Implement when matrix question UI is added
+    };
+  }
+
+  private convertConditionalRule(rule: CanvasConditionalRule, index: number): FormBuilderConditionalRuleRequest {
+    return {
+      ruleId: rule.id.includes('-') ? null : rule.id,
+      ruleGroupId: rule.ruleGroupId?.includes('-') ? null : rule.ruleGroupId ?? null,
+      sourceQuestionId: !rule.sourceQuestionId || rule.sourceQuestionId.includes('-') ? null : rule.sourceQuestionId,
+      operator: rule.operator,
+      compareValue: rule.compareValue,
+      compareToQuestionId: !rule.compareToQuestionId || rule.compareToQuestionId.includes('-') ? null : rule.compareToQuestionId,
+      actionType: rule.actionType,
+      joinType: rule.joinType,
+      sortOrder: index
     };
   }
 

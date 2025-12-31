@@ -54,6 +54,9 @@ export interface FormQuestionRequest {
   regexErrorMessage?: string;
   options: FormQuestionOptionRequest[];
   conditionalRules: FormBuilderConditionalRuleRequest[];
+  validationRules?: FormBuilderValidationRuleRequest[];
+  rows?: FormBuilderMatrixRowRequest[];
+  cols?: FormBuilderMatrixColRequest[];
 }
 
 export interface FormQuestionOptionRequest {
@@ -74,6 +77,30 @@ export interface FormBuilderConditionalRuleRequest {
   actionType: ConditionalActionType;
   joinType?: ConditionalJoinType;
   sortOrder: number;
+}
+
+export interface FormBuilderValidationRuleRequest {
+  validationId?: string | null;
+  ruleName: string;
+  expression: string;
+  errorMessage: string;
+  isActive: boolean;
+}
+
+export interface FormBuilderMatrixRowRequest {
+  rowId?: string | null;
+  rowCode?: string;
+  rowLabel: string;
+  sortOrder: number;
+}
+
+export interface FormBuilderMatrixColRequest {
+  colId?: string | null;
+  colCode: string;
+  colLabel: string;
+  sortOrder: number;
+  inputType?: string;
+  optionsJson?: string;
 }
 
 export interface SaveFormResult {
