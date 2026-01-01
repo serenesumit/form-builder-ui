@@ -161,83 +161,498 @@
     <div class="panel-content">
       <!-- General Tab -->
       @if (activeTab === 'general') {
-        <div class="form-group">
-          <label for="questionText">Question Text <span class="required">*</span></label>
-          <textarea 
-            id="questionText"
-            [(ngModel)]="questionText"
-            (ngModelChange)="onQuestionTextChange()"
-            placeholder="Enter your question"
-            rows="3"></textarea>
-        </div>
+        <!-- Content Section -->
+        <div class="properties-section">
+          <div class="section-header">
+            <span class="section-indicator content"></span>
+            <h4>Content</h4>
+          </div>
 
-        <div class="form-group">
-          <label for="questionCode">Question Code</label>
-          <input 
-            type="text" 
-            id="questionCode"
-            [(ngModel)]="questionCode"
-            (ngModelChange)="onQuestionCodeChange()"
-            placeholder="e.g., Q1, PHQ9_1">
-          <span class="field-hint">Unique identifier for this question</span>
-        </div>
+          <!-- Rich Text Block - Special Editor -->
+          @if (isRichTextBlockType()) {
+            <div class="form-group">
+              <label for="richTextContent">Rich Text Content</label>
+              <textarea 
+                id="richTextContent"
+                [(ngModel)]="questionText"
+                (ngModelChange)="onQuestionTextChange()"
+                placeholder="<p>Enter rich text content here...</p>"
+                rows="6"
+                class="code-input"></textarea>
+              <span class="field-hint">HTML formatting is supported for rich text display</span>
+            </div>
+          }
 
-        <div class="form-group">
-          <label for="helpText">Help Text</label>
-          <textarea 
-            id="helpText"
-            [(ngModel)]="helpText"
-            (ngModelChange)="onHelpTextChange()"
-            placeholder="Additional instructions for respondents"
-            rows="2"></textarea>
-        </div>
+          <!-- Display Type - HTML Content -->
+          @if (isDisplayType()) {
+            <div class="form-group">
+              <label for="displayContent">Display Content</label>
+              <textarea 
+                id="displayContent"
+                [(ngModel)]="questionText"
+                (ngModelChange)="onQuestionTextChange()"
+                placeholder="Information text to display..."
+                rows="4"></textarea>
+              <span class="field-hint">This text will be shown as read-only information</span>
+            </div>
+          }
 
-        <div class="form-group">
-          <label for="placeholder">Placeholder</label>
-          <input 
-            type="text" 
-            id="placeholder"
-            [(ngModel)]="placeholderText"
-            (ngModelChange)="onPlaceholderTextChange()"
-            placeholder="Placeholder text...">
-        </div>
+          <!-- Standard Question Text (not for display types) -->
+          @if (!isRichTextBlockType() && !isDisplayType()) {
+            <div class="form-group">
+              <label for="questionText">Question Text <span class="required">*</span></label>
+              <textarea 
+                id="questionText"
+                [(ngModel)]="questionText"
+                (ngModelChange)="onQuestionTextChange()"
+                placeholder="Enter your question"
+                rows="3"></textarea>
+            </div>
+          }
 
-        <div class="form-group">
-          <label for="defaultValue">Default Value</label>
-          <input 
-            type="text" 
-            id="defaultValue"
-            [(ngModel)]="defaultValue"
-            (ngModelChange)="onDefaultValueChange()"
-            placeholder="Default answer">
-        </div>
-
-        <div class="form-divider"></div>
-
-        <div class="toggle-group">
-          <label class="toggle-label">
+          <div class="form-group">
+            <label for="questionCode">Question Code</label>
             <input 
-              type="checkbox" 
-              [(ngModel)]="isRequired"
-              (ngModelChange)="onRequiredChange()">
-            <span class="toggle-text">
-              <span class="toggle-title">Required</span>
-              <span class="toggle-desc">Respondent must answer this question</span>
-            </span>
-          </label>
+              type="text" 
+              id="questionCode"
+              [(ngModel)]="questionCode"
+              (ngModelChange)="onQuestionCodeChange()"
+              placeholder="e.g., Q1, PHQ9_1">
+            <span class="field-hint">Unique identifier for this question</span>
+          </div>
         </div>
 
-        <div class="toggle-group">
-          <label class="toggle-label">
-            <input 
-              type="checkbox" 
-              [(ngModel)]="isPhi"
-              (ngModelChange)="onPhiChange()">
-            <span class="toggle-text">
-              <span class="toggle-title">Protected Health Info (PHI)</span>
-              <span class="toggle-desc">Contains sensitive health data</span>
-            </span>
-          </label>
+        <!-- Additional Information Section -->
+        @if (!isDisplayOnlyType()) {
+          <div class="properties-section">
+            <div class="section-header">
+              <span class="section-indicator info"></span>
+              <h4>Additional Information</h4>
+            </div>
+
+            <div class="form-group">
+              <label for="helpText">Help Text</label>
+              <textarea 
+                id="helpText"
+                [(ngModel)]="helpText"
+                (ngModelChange)="onHelpTextChange()"
+                placeholder="Additional instructions for respondents"
+                rows="2"></textarea>
+            </div>
+
+            @if (needsPlaceholder()) {
+              <div class="form-group">
+                <label for="placeholder">Placeholder</label>
+                <input 
+                  type="text" 
+                  id="placeholder"
+                  [(ngModel)]="placeholderText"
+                  (ngModelChange)="onPlaceholderTextChange()"
+                  placeholder="Placeholder text...">
+              </div>
+            }
+
+            @if (!isCalculatedType()) {
+              <div class="form-group">
+                <label for="defaultValue">Default Value</label>
+                <input 
+                  type="text" 
+                  id="defaultValue"
+                  [(ngModel)]="defaultValue"
+                  (ngModelChange)="onDefaultValueChange()"
+                  placeholder="Default answer">
+              </div>
+            }
+
+            <div class="form-divider"></div>
+
+            <div class="toggle-group">
+              <label class="toggle-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="isRequired"
+                  (ngModelChange)="onRequiredChange()">
+                <span class="toggle-text">
+                  <span class="toggle-title">Required</span>
+                  <span class="toggle-desc">Respondent must answer this question</span>
+                </span>
+              </label>
+            </div>
+
+            <div class="toggle-group">
+              <label class="toggle-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="isPhi"
+                  (ngModelChange)="onPhiChange()">
+                <span class="toggle-text">
+                  <span class="toggle-title">Protected Health Info (PHI)</span>
+                  <span class="toggle-desc">Contains sensitive health data</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        }
+
+        <!-- Control-Specific Settings Section -->
+        <div class="properties-section control-specific">
+          <div class="section-header">
+            <span class="section-indicator settings"></span>
+            <h4>{{ questionTypeName() }} Settings</h4>
+          </div>
+
+          <!-- Text Input Settings -->
+          @if (isTextType()) {
+            <div class="inline-fields">
+              <div class="form-group">
+                <label for="maxLength">Max Length</label>
+                <input 
+                  type="number" 
+                  id="maxLength"
+                  [(ngModel)]="maxLength"
+                  (ngModelChange)="onMaxLengthChange()"
+                  placeholder="255">
+              </div>
+            </div>
+          }
+
+          <!-- TextArea Settings -->
+          @if (isTextAreaType()) {
+            <div class="inline-fields">
+              <div class="form-group">
+                <label for="rows">Rows</label>
+                <input 
+                  type="number" 
+                  id="rows"
+                  [(ngModel)]="rows"
+                  (ngModelChange)="onRowsChange()"
+                  min="2"
+                  max="20">
+              </div>
+              <div class="form-group">
+                <label for="maxLength">Max Length</label>
+                <input 
+                  type="number" 
+                  id="maxLength"
+                  [(ngModel)]="maxLength"
+                  (ngModelChange)="onMaxLengthChange()"
+                  placeholder="1000">
+              </div>
+            </div>
+          }
+
+          <!-- Number Settings -->
+          @if (isNumberType()) {
+            <div class="inline-fields triple">
+              <div class="form-group">
+                <label for="minValue">Min</label>
+                <input 
+                  type="number" 
+                  id="minValue"
+                  [(ngModel)]="minValue"
+                  (ngModelChange)="onMinValueChange()"
+                  placeholder="No min">
+              </div>
+              <div class="form-group">
+                <label for="maxValue">Max</label>
+                <input 
+                  type="number" 
+                  id="maxValue"
+                  [(ngModel)]="maxValue"
+                  (ngModelChange)="onMaxValueChange()"
+                  placeholder="No max">
+              </div>
+              <div class="form-group">
+                <label for="step">Step</label>
+                <input 
+                  type="number" 
+                  id="step"
+                  [(ngModel)]="step"
+                  (ngModelChange)="onStepChange()"
+                  min="0.01">
+              </div>
+            </div>
+          }
+
+          <!-- Slider Settings -->
+          @if (isSliderType()) {
+            <div class="inline-fields triple">
+              <div class="form-group">
+                <label for="minValue">Min</label>
+                <input 
+                  type="number" 
+                  id="minValue"
+                  [(ngModel)]="minValue"
+                  (ngModelChange)="onMinValueChange()"
+                  placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="maxValue">Max</label>
+                <input 
+                  type="number" 
+                  id="maxValue"
+                  [(ngModel)]="maxValue"
+                  (ngModelChange)="onMaxValueChange()"
+                  placeholder="100">
+              </div>
+              <div class="form-group">
+                <label for="step">Step</label>
+                <input 
+                  type="number" 
+                  id="step"
+                  [(ngModel)]="step"
+                  (ngModelChange)="onStepChange()"
+                  min="1">
+              </div>
+            </div>
+            <div class="toggle-group">
+              <label class="toggle-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="showLabels"
+                  (ngModelChange)="onShowLabelsChange()">
+                <span class="toggle-text">
+                  <span class="toggle-title">Show Min/Max Labels</span>
+                  <span class="toggle-desc">Display labels at slider ends</span>
+                </span>
+              </label>
+            </div>
+          }
+
+          <!-- Scale Settings -->
+          @if (isScaleType()) {
+            <div class="inline-fields">
+              <div class="form-group">
+                <label for="minValue">Min Scale</label>
+                <input 
+                  type="number" 
+                  id="minValue"
+                  [(ngModel)]="minValue"
+                  (ngModelChange)="onMinValueChange()"
+                  placeholder="1">
+              </div>
+              <div class="form-group">
+                <label for="maxValue">Max Scale</label>
+                <input 
+                  type="number" 
+                  id="maxValue"
+                  [(ngModel)]="maxValue"
+                  (ngModelChange)="onMaxValueChange()"
+                  placeholder="5">
+              </div>
+            </div>
+            <span class="field-hint">Defines the rating scale (e.g., 1-5, 1-10)</span>
+          }
+
+          <!-- Yes/No Info -->
+          @if (isYesNoType()) {
+            <div class="info-box info">
+              <span class="material-icons">info</span>
+              <div>
+                <p class="info-title">Yes/No Question</p>
+                <p class="info-desc">This question type uses default Yes/No options. No additional configuration needed.</p>
+              </div>
+            </div>
+          }
+
+          <!-- Date/DateTime Settings -->
+          @if (isDateType()) {
+            <div class="form-group">
+              <label for="dateFormat">Date Format</label>
+              <input 
+                type="text" 
+                id="dateFormat"
+                [(ngModel)]="dateFormat"
+                (ngModelChange)="onDateFormatChange()"
+                placeholder="yyyy-MM-dd">
+            </div>
+            <div class="inline-fields">
+              <div class="form-group">
+                <label for="minDate">Min Date</label>
+                <input 
+                  type="date" 
+                  id="minDate"
+                  [(ngModel)]="minDate"
+                  (ngModelChange)="onMinDateChange()">
+              </div>
+              <div class="form-group">
+                <label for="maxDate">Max Date</label>
+                <input 
+                  type="date" 
+                  id="maxDate"
+                  [(ngModel)]="maxDate"
+                  (ngModelChange)="onMaxDateChange()">
+              </div>
+            </div>
+          }
+
+          <!-- Time Settings -->
+          @if (isTimeType()) {
+            <div class="form-group">
+              <label for="timeFormat">Time Format</label>
+              <input 
+                type="text" 
+                id="timeFormat"
+                [(ngModel)]="timeFormat"
+                (ngModelChange)="onTimeFormatChange()"
+                placeholder="HH:mm">
+            </div>
+            <div class="inline-fields">
+              <div class="form-group">
+                <label for="minTime">Min Time</label>
+                <input 
+                  type="time" 
+                  id="minTime"
+                  [(ngModel)]="minTime"
+                  (ngModelChange)="onMinTimeChange()">
+              </div>
+              <div class="form-group">
+                <label for="maxTime">Max Time</label>
+                <input 
+                  type="time" 
+                  id="maxTime"
+                  [(ngModel)]="maxTime"
+                  (ngModelChange)="onMaxTimeChange()">
+              </div>
+            </div>
+          }
+
+          <!-- File Upload Settings -->
+          @if (isFileUploadType()) {
+            <div class="form-group">
+              <label for="allowedFileTypes">Allowed File Types</label>
+              <input 
+                type="text" 
+                id="allowedFileTypes"
+                [(ngModel)]="allowedFileTypes"
+                (ngModelChange)="onAllowedFileTypesChange()"
+                placeholder="pdf,doc,docx,jpg,png">
+              <span class="field-hint">Comma-separated list of file extensions</span>
+            </div>
+            <div class="form-group">
+              <label for="maxFileSize">Max File Size (MB)</label>
+              <input 
+                type="number" 
+                id="maxFileSize"
+                [(ngModel)]="maxFileSize"
+                (ngModelChange)="onMaxFileSizeChange()"
+                min="1"
+                max="100">
+            </div>
+            <div class="toggle-group">
+              <label class="toggle-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="allowMultipleFiles"
+                  (ngModelChange)="onAllowMultipleFilesChange()">
+                <span class="toggle-text">
+                  <span class="toggle-title">Allow Multiple Files</span>
+                  <span class="toggle-desc">Users can upload more than one file</span>
+                </span>
+              </label>
+            </div>
+          }
+
+          <!-- Signature Settings -->
+          @if (isSignatureType()) {
+            <div class="form-group">
+              <label for="signatureType">Signature Type</label>
+              <select 
+                id="signatureType"
+                [(ngModel)]="signatureType"
+                (ngModelChange)="onSignatureTypeChange()">
+                <option value="drawn">Drawn Signature</option>
+                <option value="typed">Typed Signature</option>
+                <option value="electronic">Electronic Signature</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="attestationText">Attestation Text</label>
+              <textarea 
+                id="attestationText"
+                [(ngModel)]="attestationText"
+                (ngModelChange)="onAttestationTextChange()"
+                placeholder="I certify that the information provided is accurate..."
+                rows="3"></textarea>
+            </div>
+          }
+
+          <!-- Calculated Field Settings -->
+          @if (isCalculatedType()) {
+            <div class="form-group">
+              <label for="calculationFormula">Calculation Formula</label>
+              <textarea 
+                id="calculationFormula"
+                [(ngModel)]="calculationFormula"
+                (ngModelChange)="onCalculationFormulaChange()"
+                placeholder="e.g., {Q1} + {Q2} * 2"
+                rows="4"
+                class="code-input"></textarea>
+              <span class="field-hint">Use &#123;questionCode&#125; to reference other questions</span>
+            </div>
+            <div class="form-group">
+              <label for="dependentQuestions">Dependent Questions</label>
+              <input 
+                type="text" 
+                id="dependentQuestions"
+                [(ngModel)]="dependentQuestions"
+                (ngModelChange)="onDependentQuestionsChange()"
+                placeholder="Q1, Q2, Q3">
+              <span class="field-hint">Comma-separated question codes that trigger recalculation</span>
+            </div>
+          }
+
+          <!-- Hidden Field Settings -->
+          @if (isHiddenType()) {
+            <div class="form-group">
+              <label for="defaultValue">Default Value</label>
+              <input 
+                type="text" 
+                id="defaultValue"
+                [(ngModel)]="defaultValue"
+                (ngModelChange)="onDefaultValueChange()"
+                placeholder="Default value for hidden field">
+            </div>
+            <div class="info-box warning">
+              <span class="material-icons">visibility_off</span>
+              <div>
+                <p class="info-title">Hidden Field</p>
+                <p class="info-desc">Hidden fields are not visible to users but can store data and be used in calculations.</p>
+              </div>
+            </div>
+          }
+
+          <!-- Matrix Info -->
+          @if (isMatrixType()) {
+            <div class="info-box info">
+              <span class="material-icons">grid_on</span>
+              <div>
+                <p class="info-title">Matrix Question</p>
+                <p class="info-desc">Configure rows and columns in the Options tab. Each row will display all column options.</p>
+              </div>
+            </div>
+          }
+
+          <!-- Table Info -->
+          @if (isTableType()) {
+            <div class="info-box info">
+              <span class="material-icons">table_chart</span>
+              <div>
+                <p class="info-title">Table Question</p>
+                <p class="info-desc">Configure rows and columns for the data table. Each cell can have different input types.</p>
+              </div>
+            </div>
+          }
+
+          <!-- Options-based question hint -->
+          @if (hasOptions() && !isScaleType() && !isMatrixType()) {
+            <div class="info-box hint">
+              <span class="material-icons">lightbulb</span>
+              <div>
+                <p class="info-desc">Configure answer options in the <strong>Options</strong> tab.</p>
+              </div>
+            </div>
+          }
         </div>
       }
 
