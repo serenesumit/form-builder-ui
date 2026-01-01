@@ -241,10 +241,15 @@ export class FormBuilderComponent implements OnInit {
     }
 
     // Navigate to preview page
-    const id = this.definitionId();
-    if (id) {
-      // If editing existing form, navigate to preview by definition ID
-      this.router.navigate(['/forms/preview', id]);
+    const versionId = this.currentVersionId();
+    const defId = this.definitionId();
+    
+    if (versionId) {
+      // If a specific version is selected, navigate to preview by version ID
+      this.router.navigate(['/forms/preview/version', versionId]);
+    } else if (defId) {
+      // If editing existing form but no version selected, navigate by definition ID
+      this.router.navigate(['/forms/preview', defId]);
     } else {
       // If creating new form, show alert that form must be saved first
       alert('Please save the form first before previewing. The preview feature requires a saved form.');
