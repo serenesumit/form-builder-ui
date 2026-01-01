@@ -168,18 +168,17 @@
             <h4>Content</h4>
           </div>
 
-          <!-- Rich Text Block - Special Editor -->
+          <!-- Rich Text Block - WYSIWYG Editor -->
           @if (isRichTextBlockType()) {
-            <div class="form-group">
-              <label for="richTextContent">Rich Text Content</label>
-              <textarea 
-                id="richTextContent"
-                [(ngModel)]="questionText"
-                (ngModelChange)="onQuestionTextChange()"
-                placeholder="<p>Enter rich text content here...</p>"
-                rows="6"
-                class="code-input"></textarea>
-              <span class="field-hint">HTML formatting is supported for rich text display</span>
+            <div class="form-group rich-text-editor-group">
+              <label>Rich Text Content</label>
+              <app-rich-text-editor
+                [value]="questionText"
+                [placeholder]="'Enter rich text content here...'"
+                [height]="250"
+                (valueChange)="onRichTextChange($event)">
+              </app-rich-text-editor>
+              <span class="field-hint">Use the toolbar to format your text with headings, lists, links, and more</span>
             </div>
           }
 
@@ -633,15 +632,14 @@
             </div>
           }
 
-          <!-- Table Info -->
+          <!-- Table Editor -->
           @if (isTableType()) {
-            <div class="info-box info">
-              <span class="material-icons">table_chart</span>
-              <div>
-                <p class="info-title">Table Question</p>
-                <p class="info-desc">Configure rows and columns for the data table. Each cell can have different input types.</p>
-              </div>
-            </div>
+            @if (selectedQuestion(); as question) {
+              <app-table-editor
+                [question]="question"
+                (questionChange)="onTableConfigChange($event)">
+              </app-table-editor>
+            }
           }
 
           <!-- Options-based question hint -->

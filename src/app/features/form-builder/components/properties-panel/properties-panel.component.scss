@@ -506,6 +506,14 @@ input[type="time"] {
   }
 }
 
+// Rich Text Editor Group
+.rich-text-editor-group {
+  app-rich-text-editor {
+    display: block;
+    margin-bottom: 8px;
+  }
+}
+
 // Info boxes
 .info-box {
   display: flex;

@@ -1,0 +1,13 @@
+<div class="rich-text-editor-wrapper">
+  <ejs-richtexteditor
+    #rte
+    [(value)]="value"
+    [toolbarSettings]="toolbarSettings"
+    [quickToolbarSettings]="quickToolbarSettings"
+    [placeholder]="placeholder"
+    [height]="height"
+    (change)="onValueChange()"
+    (created)="onCreated()">
+  </ejs-richtexteditor>
+</div>
+

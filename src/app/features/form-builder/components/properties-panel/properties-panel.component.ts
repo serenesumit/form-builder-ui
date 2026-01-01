@@ -12,6 +12,8 @@ import {
   questionTypeSupportsOptions
 } from '../../models/form-builder.types';
 import { ConditionalLogicBuilderComponent } from '../conditional-logic-builder/conditional-logic-builder.component';
+import { TableEditorComponent } from '../table-editor/table-editor.component';
+import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.component';
 import { QuestionType } from '@core/models/form-builder.models';
 
 type PanelTab = 'general' | 'validation' | 'options' | 'logic' | 'advanced';
@@ -19,7 +21,7 @@ type PanelTab = 'general' | 'validation' | 'options' | 'logic' | 'advanced';
 @Component({
   selector: 'app-properties-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConditionalLogicBuilderComponent],
+  imports: [CommonModule, FormsModule, ConditionalLogicBuilderComponent, TableEditorComponent, RichTextEditorComponent],
   templateUrl: './properties-panel.component.html',
   styleUrls: ['./properties-panel.component.scss']
 })
@@ -387,6 +389,20 @@ export class PropertiesPanelComponent {
 
   onDependentQuestionsChange(): void {
     this.updateQuestionField('dependentQuestions' as any, this.dependentQuestions);
+  }
+
+  // Table Editor Update
+  onTableConfigChange(updates: Partial<CanvasQuestion>): void {
+    const sel = this.selection();
+    if (sel.sectionIndex === null || sel.questionIndex === null) return;
+    
+    this.store.updateQuestion(sel.sectionIndex, sel.questionIndex, updates);
+  }
+
+  // Rich Text Editor Update
+  onRichTextChange(content: string): void {
+    this.questionText = content;
+    this.updateQuestionField('questionText', content);
   }
 
   // Section Updates

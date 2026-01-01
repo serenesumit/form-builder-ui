@@ -122,6 +122,23 @@ export interface CanvasConditionalRule {
   sortOrder: number;
 }
 
+// Table Row/Column Types
+export interface CanvasTableRow {
+  rowId: string;
+  rowCode: string;
+  rowLabel: string;
+  sortOrder: number;
+}
+
+export interface CanvasTableCol {
+  colId: string;
+  colCode: string;
+  colLabel: string;
+  sortOrder: number;
+  inputType: 'text' | 'number' | 'radio' | 'checkbox' | 'dropdown';
+  options?: CanvasQuestionOption[];
+}
+
 export type ConditionalOperator =
   | 'equals'
   | 'not_equals'

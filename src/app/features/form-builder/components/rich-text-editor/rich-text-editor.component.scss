@@ -1,0 +1,181 @@
+.rich-text-editor-wrapper {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+
+  :host ::ng-deep {
+    .e-richtexteditor {
+      border: none;
+      
+      .e-rte-toolbar {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 4px 8px;
+        
+        .e-toolbar-items {
+          .e-toolbar-item {
+            .e-tbar-btn {
+              background: transparent;
+              border: none;
+              border-radius: 4px;
+              color: #475569;
+              
+              &:hover {
+                background: #e2e8f0;
+                color: #1e293b;
+              }
+              
+              &.e-active {
+                background: #e0e7ff;
+                color: #4338ca;
+              }
+            }
+          }
+          
+          .e-separator {
+            border-color: #e2e8f0;
+          }
+        }
+      }
+      
+      .e-rte-content {
+        background: #fff;
+        
+        .e-content {
+          padding: 16px;
+          min-height: 200px;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #1e293b;
+          
+          p {
+            margin-bottom: 12px;
+          }
+          
+          h1, h2, h3, h4, h5, h6 {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+          }
+          
+          ul, ol {
+            margin-bottom: 12px;
+            padding-left: 24px;
+          }
+          
+          li {
+            margin-bottom: 4px;
+          }
+          
+          a {
+            color: #6366f1;
+            text-decoration: underline;
+          }
+          
+          blockquote {
+            border-left: 4px solid #6366f1;
+            padding-left: 16px;
+            margin: 12px 0;
+            color: #64748b;
+            font-style: italic;
+          }
+          
+          table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            
+            th, td {
+              border: 1px solid #e2e8f0;
+              padding: 8px 12px;
+            }
+            
+            th {
+              background: #f8fafc;
+              font-weight: 600;
+            }
+          }
+          
+          &[contenteditable="true"]:empty::before {
+            content: attr(placeholder);
+            color: #94a3b8;
+            pointer-events: none;
+          }
+        }
+      }
+      
+      .e-rte-character-count {
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        padding: 8px 12px;
+        font-size: 11px;
+        color: #64748b;
+      }
+      
+      &.e-rte-tb-expand {
+        .e-rte-toolbar {
+          .e-toolbar-extended {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+          }
+        }
+      }
+    }
+    
+    // Quick toolbar styling
+    .e-rte-quick-popup {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      
+      .e-rte-quick-toolbar {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        
+        .e-toolbar-item {
+          .e-tbar-btn {
+            background: transparent;
+            border: none;
+            color: #475569;
+            
+            &:hover {
+              background: #f1f5f9;
+            }
+          }
+        }
+      }
+    }
+    
+    // Link dialog styling
+    .e-rte-link-dialog,
+    .e-rte-img-dialog,
+    .e-rte-table-dialog {
+      .e-dlg-header {
+        font-weight: 600;
+        color: #1e293b;
+      }
+      
+      .e-input-group {
+        .e-input {
+          border-radius: 6px;
+        }
+      }
+      
+      .e-btn {
+        border-radius: 6px;
+        
+        &.e-primary {
+          background: #6366f1;
+          border-color: #6366f1;
+          
+          &:hover {
+            background: #4f46e5;
+          }
+        }
+      }
+    }
+  }
+}
+
