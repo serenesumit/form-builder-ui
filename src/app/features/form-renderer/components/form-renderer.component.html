@@ -276,21 +276,21 @@
                       }
                       @case ('TABLE') {
                         <div class="data-table">
-                          @if (question.tableConfig?.rows?.length && question.tableConfig?.columns?.length) {
+                          @if (question.rows?.length && question.cols?.length) {
                             <table>
                               <thead>
                                 <tr>
                                   <th></th>
-                                  @for (col of question.tableConfig!.columns; track col.columnId) {
-                                    <th>{{ col.columnLabel }}</th>
+                                  @for (col of question.cols; track col.colId || col.colCode) {
+                                    <th>{{ col.colLabel }}</th>
                                   }
                                 </tr>
                               </thead>
                               <tbody>
-                                @for (row of question.tableConfig!.rows; track row.rowId) {
+                                @for (row of question.rows; track row.rowId || row.rowCode) {
                                   <tr>
                                     <td class="row-label">{{ row.rowLabel }}</td>
-                                    @for (col of question.tableConfig!.columns; track col.columnId) {
+                                    @for (col of question.cols; track col.colId || col.colCode) {
                                       <td>
                                         @switch (col.inputType) {
                                           @case ('text') {
@@ -300,7 +300,7 @@
                                             <input type="number" class="table-input" placeholder="0" />
                                           }
                                           @case ('radio') {
-                                            <input type="radio" [name]="question.id + '_' + row.rowId" />
+                                            <input type="radio" [name]="question.id + '_' + (row.rowId || row.rowCode)" />
                                           }
                                           @case ('checkbox') {
                                             <input type="checkbox" />
@@ -308,9 +308,6 @@
                                           @case ('dropdown') {
                                             <select class="table-select">
                                               <option value="">Select...</option>
-                                              @for (opt of col.options || []; track opt.optionId) {
-                                                <option [value]="opt.optionValue">{{ opt.optionText }}</option>
-                                              }
                                             </select>
                                           }
                                           @default {
