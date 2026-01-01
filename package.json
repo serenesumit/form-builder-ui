@@ -29,6 +29,7 @@
     "@syncfusion/ej2-angular-inputs": "^25.1.35",
     "@syncfusion/ej2-angular-navigations": "^25.1.35",
     "@syncfusion/ej2-angular-popups": "^25.1.35",
+    "@syncfusion/ej2-angular-richtexteditor": "^25.1.35",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3",
