@@ -47,7 +47,8 @@
               "node_modules/@syncfusion/ej2-dropdowns/styles/material.css",
               "node_modules/@syncfusion/ej2-grids/styles/material.css",
               "node_modules/@syncfusion/ej2-calendars/styles/material.css",
-              "node_modules/@syncfusion/ej2-angular-calendars/styles/material.css"
+              "node_modules/@syncfusion/ej2-angular-calendars/styles/material.css",
+              "node_modules/@syncfusion/ej2-richtexteditor/styles/material.css"
             ],
             "scripts": []
           },

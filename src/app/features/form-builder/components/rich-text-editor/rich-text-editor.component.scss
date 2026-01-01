@@ -1,252 +1,177 @@
+// Rich Text Editor Container
 .rich-text-editor-container {
   width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-
-  &:focus-within {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  
+  .e-richtexteditor {
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    
+    &.e-rte-tb-expand {
+      border-radius: 8px !important;
+    }
+  }
+  
+  // Toolbar Styles
+  .e-rte-toolbar {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 8px !important;
+    
+    .e-toolbar-items {
+      background: transparent !important;
+      
+      .e-toolbar-item {
+        padding: 2px !important;
+        
+        .e-tbar-btn {
+          background: transparent !important;
+          border: none !important;
+          border-radius: 4px !important;
+          color: #475569 !important;
+          min-width: 28px !important;
+          min-height: 28px !important;
+          padding: 4px !important;
+          
+          &:hover {
+            background: #e2e8f0 !important;
+            color: #1e293b !important;
+          }
+          
+          &.e-active {
+            background: #ddd6fe !important;
+            color: #6366f1 !important;
+          }
+          
+          .e-icons {
+            font-size: 14px !important;
+          }
+        }
+        
+        .e-dropdown-btn {
+          background: #fff !important;
+          border: 1px solid #e2e8f0 !important;
+          border-radius: 4px !important;
+          padding: 4px 8px !important;
+          min-height: 28px !important;
+          font-size: 12px !important;
+          
+          &:hover {
+            background: #f1f5f9 !important;
+          }
+        }
+      }
+      
+      .e-separator {
+        border-color: #e2e8f0 !important;
+        margin: 0 4px !important;
+      }
+    }
+    
+    // Multi-row toolbar
+    .e-toolbar-extended {
+      background: #f8fafc !important;
+      border-top: 1px solid #e2e8f0 !important;
+      padding: 4px 8px !important;
+    }
+  }
+  
+  // Content Area
+  .e-rte-content {
+    background: #fff !important;
+    
+    .e-content {
+      padding: 12px !important;
+      min-height: 150px !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      font-size: 14px !important;
+      line-height: 1.6 !important;
+      color: #1e293b !important;
+      
+      &:focus {
+        outline: none !important;
+      }
+      
+      p {
+        margin: 0 0 10px !important;
+        
+        &:last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      
+      h1, h2, h3, h4, h5, h6 {
+        margin: 12px 0 8px !important;
+        font-weight: 600 !important;
+        color: #0f172a !important;
+      }
+      
+      ul, ol {
+        margin: 8px 0 !important;
+        padding-left: 20px !important;
+      }
+      
+      a {
+        color: #6366f1 !important;
+        text-decoration: underline !important;
+      }
+      
+      strong, b {
+        font-weight: 600 !important;
+      }
+      
+      em, i {
+        font-style: italic !important;
+      }
+    }
+    
+    // Placeholder
+    .e-rte-placeholder {
+      color: #9ca3af !important;
+      font-style: normal !important;
+      padding: 12px !important;
+    }
+  }
+  
+  // Focus state
+  .e-richtexteditor:focus-within {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
   }
 }
 
-// Override Syncfusion RTE styles
-:host ::ng-deep {
-  .e-richtexteditor {
-    border: none !important;
-
-    // Toolbar
-    .e-rte-toolbar {
-      background: #f8fafc !important;
-      border-bottom: 1px solid #e2e8f0 !important;
-      padding: 8px !important;
-      min-height: 48px !important;
-
-      .e-toolbar-items {
-        .e-toolbar-item {
-          padding: 0 2px !important;
-
-          .e-tbar-btn {
-            background: transparent !important;
-            border: none !important;
-            border-radius: 4px !important;
-            color: #475569 !important;
-            min-width: 32px !important;
-            min-height: 32px !important;
-            cursor: pointer !important;
-
-            &:hover {
-              background: #e2e8f0 !important;
-              color: #1e293b !important;
-            }
-
-            &.e-active {
-              background: #e0e7ff !important;
-              color: #4338ca !important;
-            }
-
-            .e-icons,
-            .e-btn-icon {
-              font-size: 14px !important;
-            }
-          }
-
-          .e-dropdown-btn,
-          .e-rte-dropdown-btn {
-            background: #fff !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 4px !important;
-            color: #475569 !important;
-            padding: 4px 8px !important;
-            min-height: 32px !important;
-            font-size: 13px !important;
-            cursor: pointer !important;
-
-            &:hover {
-              background: #f1f5f9 !important;
-              border-color: #cbd5e1 !important;
-            }
-
-            .e-caret {
-              margin-left: 4px !important;
-            }
-          }
-        }
-
-        .e-separator {
-          border-left: 1px solid #e2e8f0 !important;
-          height: 24px !important;
-          margin: 4px 8px !important;
-        }
-      }
+// Dropdown Popup (global)
+.e-dropdown-popup {
+  border-radius: 6px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  
+  .e-list-item {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    
+    &:hover {
+      background: #f1f5f9 !important;
     }
-
-    // Content area
-    .e-rte-content {
-      background: #fff !important;
-      min-height: 200px !important;
-
-      .e-content {
-        padding: 16px !important;
-        min-height: 180px !important;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-        font-size: 14px !important;
-        line-height: 1.6 !important;
-        color: #1e293b !important;
-        cursor: text !important;
-
-        &:focus {
-          outline: none !important;
-        }
-
-        p {
-          margin: 0 0 12px !important;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-          margin: 16px 0 8px !important;
-          font-weight: 600 !important;
-          color: #0f172a !important;
-        }
-
-        h1 { font-size: 2em !important; }
-        h2 { font-size: 1.5em !important; }
-        h3 { font-size: 1.25em !important; }
-
-        ul, ol {
-          margin: 0 0 12px !important;
-          padding-left: 24px !important;
-        }
-
-        li {
-          margin-bottom: 4px !important;
-        }
-
-        a {
-          color: #6366f1 !important;
-          text-decoration: underline !important;
-        }
-
-        blockquote {
-          border-left: 4px solid #6366f1 !important;
-          padding: 8px 16px !important;
-          margin: 12px 0 !important;
-          background: #f5f3ff !important;
-          color: #4b5563 !important;
-          font-style: italic !important;
-        }
-
-        table {
-          border-collapse: collapse !important;
-          width: 100% !important;
-          margin: 12px 0 !important;
-
-          th, td {
-            border: 1px solid #e2e8f0 !important;
-            padding: 8px 12px !important;
-          }
-
-          th {
-            background: #f8fafc !important;
-            font-weight: 600 !important;
-          }
-        }
-      }
-
-      // Placeholder
-      .e-rte-placeholder {
-        color: #94a3b8 !important;
-        font-style: normal !important;
-        padding: 16px !important;
-      }
-    }
-
-    // Source code view
-    .e-rte-srctextarea {
-      font-family: 'Monaco', 'Menlo', monospace !important;
-      font-size: 13px !important;
-      padding: 16px !important;
-      background: #1e293b !important;
-      color: #f8fafc !important;
-      border: none !important;
+    
+    &.e-active {
+      background: #e0e7ff !important;
+      color: #4338ca !important;
     }
   }
+}
 
-  // Dropdown popups
-  .e-dropdown-popup,
-  .e-rte-dropdown-popup {
-    border-radius: 8px !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
-
-    .e-list-parent {
-      padding: 4px !important;
-
-      .e-list-item {
-        padding: 8px 12px !important;
-        border-radius: 4px !important;
-        font-size: 13px !important;
-        cursor: pointer !important;
-
-        &:hover {
-          background: #f1f5f9 !important;
-        }
-
-        &.e-active {
-          background: #e0e7ff !important;
-          color: #4338ca !important;
-        }
-      }
-    }
+// Link Dialog (global)
+.e-rte-link-dialog {
+  border-radius: 8px !important;
+  
+  .e-dlg-header {
+    font-weight: 600 !important;
   }
-
-  // Color picker
-  .e-colorpicker-popup {
-    border-radius: 8px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
-  }
-
-  // Dialogs
-  .e-rte-link-dialog,
-  .e-rte-img-dialog,
-  .e-rte-table-dialog {
-    border-radius: 12px !important;
-
-    .e-dlg-header-content {
-      padding: 16px 20px !important;
-      border-bottom: 1px solid #e2e8f0 !important;
-
-      .e-dlg-header {
-        font-weight: 600 !important;
-        font-size: 16px !important;
-      }
-    }
-
-    .e-footer-content {
-      padding: 16px 20px !important;
-      border-top: 1px solid #e2e8f0 !important;
-
-      .e-btn {
-        border-radius: 6px !important;
-        padding: 8px 16px !important;
-
-        &.e-primary {
-          background: #6366f1 !important;
-          border-color: #6366f1 !important;
-        }
-      }
-    }
-  }
-
-  // Quick toolbar
-  .e-rte-quick-popup {
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-
-    .e-rte-quick-toolbar {
-      background: #fff !important;
-      padding: 4px !important;
-    }
+  
+  .e-btn.e-primary {
+    background: #6366f1 !important;
+    border-color: #6366f1 !important;
+    border-radius: 6px !important;
   }
 }

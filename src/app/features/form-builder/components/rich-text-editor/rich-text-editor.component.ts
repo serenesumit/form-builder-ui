@@ -1,15 +1,11 @@
-import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { 
   RichTextEditorModule, 
   ToolbarService, 
   LinkService, 
-  ImageService, 
   HtmlEditorService,
-  QuickToolbarService,
-  TableService,
-  CountService,
   ToolbarSettingsModel
 } from '@syncfusion/ej2-angular-richtexteditor';
 
@@ -20,11 +16,7 @@ import {
   providers: [
     ToolbarService, 
     LinkService, 
-    ImageService, 
-    HtmlEditorService, 
-    QuickToolbarService, 
-    TableService, 
-    CountService,
+    HtmlEditorService,
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => RichTextEditorComponent),
@@ -32,7 +24,8 @@ import {
     }
   ],
   templateUrl: './rich-text-editor.component.html',
-  styleUrls: ['./rich-text-editor.component.scss']
+  styleUrls: ['./rich-text-editor.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class RichTextEditorComponent implements ControlValueAccessor {
   @Input() placeholder = 'Enter rich text content here...';
@@ -50,16 +43,13 @@ export class RichTextEditorComponent implements ControlValueAccessor {
 
   content = '';
 
+  // Simplified toolbar that fits in narrow panel
   toolbarSettings: ToolbarSettingsModel = {
     items: [
-      'Bold', 'Italic', 'Underline', 'StrikeThrough', '|',
-      'FontName', 'FontSize', '|',
-      'FontColor', 'BackgroundColor', '|',
+      'Bold', 'Italic', 'Underline', '|',
       'Formats', '|',
-      'Alignments', '|',
-      'OrderedList', 'UnorderedList', 'Outdent', 'Indent', '|',
+      'OrderedList', 'UnorderedList', '|',
       'CreateLink', '|',
-      'ClearFormat', 'SourceCode', '|',
       'Undo', 'Redo'
     ]
   };
