@@ -5,6 +5,9 @@ import { FormPreviewComponent } from '../../components/form-preview/form-preview
 import { FormBuilderApiService } from '@core/services/form-builder-api.service';
 import { FormBuilderDto } from '@core/models/form-builder.models';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { TabModule, SelectEventArgs } from '@syncfusion/ej2-angular-navigations';
+
+export type ViewMode = 'scroll' | 'tabs';
 
 /**
  * FormPreviewPage Component
@@ -22,7 +25,8 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
   imports: [
     CommonModule,
     FormPreviewComponent,
-    ButtonModule
+    ButtonModule,
+    TabModule
   ],
   templateUrl: './form-preview-page.component.html',
   styleUrls: ['./form-preview-page.component.scss']
@@ -33,6 +37,8 @@ export class FormPreviewPageComponent implements OnInit {
   formName = signal<string>('');
   formDefinition = signal<FormBuilderDto | null>(null);
   versionId = signal<string | undefined>(undefined);
+  viewMode = signal<ViewMode>('scroll');
+  selectedTabIndex = signal<number>(0);
 
   constructor(
     private route: ActivatedRoute,
@@ -145,5 +151,26 @@ export class FormPreviewPageComponent implements OnInit {
 
     // Fallback to legacy flat structure
     return form?.questions || [];
+  }
+
+  /**
+   * Set view mode (scroll or tabs)
+   */
+  setViewMode(mode: ViewMode): void {
+    this.viewMode.set(mode);
+  }
+
+  /**
+   * Get questions for a specific section
+   */
+  getSectionQuestions(sectionId: string) {
+    return this.getQuestions().filter(q => q.sectionId === sectionId);
+  }
+
+  /**
+   * Handle tab selection event (like FormEditorComponent)
+   */
+  onTabSelected(event: SelectEventArgs): void {
+    this.selectedTabIndex.set(event.selectedIndex);
   }
 }
