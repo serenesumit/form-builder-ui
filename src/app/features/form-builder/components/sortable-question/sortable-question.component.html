@@ -25,9 +25,9 @@
     @if (isHtmlContent) {
       <div class="question-text rich-text-preview" [innerHTML]="question().questionText"></div>
     } @else {
-      <div class="question-text">
-        {{ question().questionText }}
-      </div>
+    <div class="question-text">
+      {{ question().questionText }}
+    </div>
     }
 
     @if (question().helpText) {
