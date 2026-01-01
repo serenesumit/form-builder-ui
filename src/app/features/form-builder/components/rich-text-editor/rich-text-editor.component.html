@@ -1,13 +1,11 @@
-<div class="rich-text-editor-wrapper">
+<div class="rich-text-editor-container">
   <ejs-richtexteditor
     #rte
-    [(value)]="value"
+    [value]="content"
     [toolbarSettings]="toolbarSettings"
-    [quickToolbarSettings]="quickToolbarSettings"
     [placeholder]="placeholder"
     [height]="height"
-    (change)="onValueChange()"
-    (created)="onCreated()">
+    (change)="onEditorChange($event)">
   </ejs-richtexteditor>
 </div>
 

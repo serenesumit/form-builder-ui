@@ -2,6 +2,7 @@ import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilderStoreService } from '../../services/form-builder-store.service';
 import { CanvasQuestion, getQuestionTypeIcon, getQuestionTypeName, questionTypeSupportsOptions } from '../../models/form-builder.types';
+import { QuestionType } from '../../../../core/models/form-builder.models';
 
 @Component({
   selector: 'app-sortable-question',
@@ -39,6 +40,18 @@ export class SortableQuestionComponent {
 
   get optionCount(): number {
     return this.question().options?.length || 0;
+  }
+
+  get isRichTextBlock(): boolean {
+    return this.question().questionTypeId === QuestionType.RichTextBlock;
+  }
+
+  get isDisplayType(): boolean {
+    return this.question().questionTypeId === QuestionType.Display;
+  }
+
+  get isHtmlContent(): boolean {
+    return this.isRichTextBlock || this.isDisplayType;
   }
 
   onSelect(event: MouseEvent): void {

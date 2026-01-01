@@ -1,9 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { 
   RichTextEditorModule, 
-  RichTextEditorComponent as SyncfusionRTE,
   ToolbarService, 
   LinkService, 
   ImageService, 
@@ -11,57 +10,81 @@ import {
   QuickToolbarService,
   TableService,
   CountService,
-  ToolbarSettingsModel,
-  QuickToolbarSettingsModel
+  ToolbarSettingsModel
 } from '@syncfusion/ej2-angular-richtexteditor';
 
 @Component({
   selector: 'app-rich-text-editor',
   standalone: true,
   imports: [CommonModule, FormsModule, RichTextEditorModule],
-  providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, QuickToolbarService, TableService, CountService],
+  providers: [
+    ToolbarService, 
+    LinkService, 
+    ImageService, 
+    HtmlEditorService, 
+    QuickToolbarService, 
+    TableService, 
+    CountService,
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => RichTextEditorComponent),
+      multi: true
+    }
+  ],
   templateUrl: './rich-text-editor.component.html',
   styleUrls: ['./rich-text-editor.component.scss']
 })
-export class RichTextEditorComponent implements OnInit {
-  @ViewChild('rte') rteObj!: SyncfusionRTE;
-  
-  @Input() value = '';
+export class RichTextEditorComponent implements ControlValueAccessor {
   @Input() placeholder = 'Enter rich text content here...';
-  @Input() height = 300;
+  @Input() height = 250;
+  
+  @Input() 
+  set value(val: string) {
+    this.content = val || '';
+  }
+  get value(): string {
+    return this.content;
+  }
   
   @Output() valueChange = new EventEmitter<string>();
+
+  content = '';
 
   toolbarSettings: ToolbarSettingsModel = {
     items: [
       'Bold', 'Italic', 'Underline', 'StrikeThrough', '|',
-      'FontName', 'FontSize', 'FontColor', 'BackgroundColor', '|',
-      'Formats', 'Alignments', '|',
+      'FontName', 'FontSize', '|',
+      'FontColor', 'BackgroundColor', '|',
+      'Formats', '|',
+      'Alignments', '|',
       'OrderedList', 'UnorderedList', 'Outdent', 'Indent', '|',
-      'CreateLink', 'CreateTable', '|',
+      'CreateLink', '|',
       'ClearFormat', 'SourceCode', '|',
       'Undo', 'Redo'
     ]
   };
 
-  quickToolbarSettings: QuickToolbarSettingsModel = {
-    table: ['TableHeader', 'TableRows', 'TableColumns', 'TableCell', '-', 'BackgroundColor', 'TableRemove', 'TableCellVerticalAlign', 'Styles'],
-    link: ['Open', 'Edit', 'UnLink']
-  };
+  // ControlValueAccessor implementation
+  private onChange: (value: string) => void = () => {};
+  private onTouched: () => void = () => {};
 
-  ngOnInit(): void {
-    // Component initialization
+  writeValue(value: string): void {
+    this.content = value || '';
   }
 
-  onValueChange(): void {
-    if (this.rteObj) {
-      const content = this.rteObj.value;
-      this.valueChange.emit(content);
-    }
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChange = fn;
   }
 
-  onCreated(): void {
-    // RTE is ready
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  onEditorChange(event: any): void {
+    const newValue = event.value || '';
+    this.content = newValue;
+    this.valueChange.emit(newValue);
+    this.onChange(newValue);
+    this.onTouched();
   }
 }
-
