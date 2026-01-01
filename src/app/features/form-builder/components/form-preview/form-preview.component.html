@@ -17,20 +17,26 @@
 
           <div class="questions-container">
             @for (question of getSectionQuestions(section.sectionId); track question.questionId) {
+              <!-- Skip hidden fields entirely -->
+              @if (question.questionTypeId !== QuestionType.Hidden) {
               <div class="question-item"
+                   [class.display-only]="isDisplayOnlyType(question.questionTypeId)"
                    [style.background-color]="question.backgroundColor || 'transparent'"
                    [style.border-color]="question.borderColor || '#e5e7eb'"
                    [style.min-height.px]="question.height || 'auto'">
 
-                <label class="question-label">
-                  {{ question.questionText }}
-                  @if (question.isRequired) {
-                    <span class="required-indicator">*</span>
-                  }
-                </label>
+                <!-- Only show label for non-display-only types -->
+                @if (!isDisplayOnlyType(question.questionTypeId)) {
+                  <label class="question-label">
+                    {{ question.questionText }}
+                    @if (question.isRequired) {
+                      <span class="required-indicator">*</span>
+                    }
+                  </label>
 
-                @if (question.helpText) {
-                  <p class="help-text">{{ question.helpText }}</p>
+                  @if (question.helpText) {
+                    <p class="help-text">{{ question.helpText }}</p>
+                  }
                 }
 
                 <!-- Text Input -->
@@ -72,31 +78,6 @@
                   </ejs-numerictextbox>
                 }
 
-                <!-- Email Input -->
-                @if (question.questionTypeId === QuestionType.Email) {
-                  <ejs-textbox
-                    [value]="getQuestionValue(question.questionId)"
-                    (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
-                    [placeholder]="question.placeholderText || 'email@example.com'"
-                    type="email"
-                    [readonly]="readonly"
-                    [enabled]="!readonly"
-                    cssClass="form-control">
-                  </ejs-textbox>
-                }
-
-                <!-- Phone Input -->
-                @if (question.questionTypeId === QuestionType.Phone) {
-                  <ejs-textbox
-                    [value]="getQuestionValue(question.questionId)"
-                    (input)="handleQuestionChange(question.questionId, $any($event.target).value)"
-                    [placeholder]="question.placeholderText || '(123) 456-7890'"
-                    type="tel"
-                    [readonly]="readonly"
-                    [enabled]="!readonly"
-                    cssClass="form-control">
-                  </ejs-textbox>
-                }
 
                 <!-- Date Picker -->
                 @if (question.questionTypeId === QuestionType.Date) {
@@ -134,23 +115,6 @@
                   </ejs-datetimepicker>
                 }
 
-                <!-- Radio Buttons -->
-                @if (question.questionTypeId === QuestionType.Radio) {
-                  <div class="options-container">
-                    @for (option of question.options; track option.optionId) {
-                      <div class="option-item">
-                        <ejs-radiobutton
-                          [label]="option.optionText"
-                          [name]="question.questionId"
-                          [value]="option.optionValue || option.optionText"
-                          [checked]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
-                          (change)="handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
-                          [disabled]="readonly">
-                        </ejs-radiobutton>
-                      </div>
-                    }
-                  </div>
-                }
 
                 <!-- Checkboxes -->
                 @if (question.questionTypeId === QuestionType.Checkbox) {
@@ -200,19 +164,201 @@
                   </div>
                 }
 
-                <!-- Rating -->
-                @if (question.questionTypeId === QuestionType.Rating) {
-                  <div class="rating-container">
-                    @for (option of question.options; track option.optionId) {
-                      <ejs-radiobutton
-                        [label]="option.optionText"
-                        [name]="question.questionId + '_rating'"
-                        [value]="option.optionValue || option.optionText"
-                        [checked]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
-                        (change)="handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
+                <!-- Rating / Scale -->
+                @if (question.questionTypeId === QuestionType.Scale) {
+                  <div class="scale-container">
+                    @for (num of getScaleOptions(question); track num) {
+                      <button
+                        type="button"
+                        class="scale-option"
+                        [class.selected]="getQuestionValue(question.questionId) === num"
                         [disabled]="readonly"
-                        cssClass="e-rating-option">
-                      </ejs-radiobutton>
+                        (click)="handleQuestionChange(question.questionId, num)">
+                        {{ num }}
+                      </button>
+                    }
+                  </div>
+                }
+
+                <!-- Yes/No -->
+                @if (question.questionTypeId === QuestionType.YesNo) {
+                  <div class="yesno-container">
+                    <ejs-radiobutton
+                      label="Yes"
+                      [name]="question.questionId + '_yesno'"
+                      value="true"
+                      [checked]="getQuestionValue(question.questionId) === true || getQuestionValue(question.questionId) === 'true'"
+                      (change)="handleQuestionChange(question.questionId, true)"
+                      [disabled]="readonly">
+                    </ejs-radiobutton>
+                    <ejs-radiobutton
+                      label="No"
+                      [name]="question.questionId + '_yesno'"
+                      value="false"
+                      [checked]="getQuestionValue(question.questionId) === false || getQuestionValue(question.questionId) === 'false'"
+                      (change)="handleQuestionChange(question.questionId, false)"
+                      [disabled]="readonly">
+                    </ejs-radiobutton>
+                  </div>
+                }
+
+                <!-- Multiple Choice (Single Select) -->
+                @if (question.questionTypeId === QuestionType.MultipleChoice) {
+                  <div class="options-container">
+                    @for (option of question.options; track option.optionId) {
+                      <div class="option-item">
+                        <ejs-radiobutton
+                          [label]="option.optionText"
+                          [name]="question.questionId"
+                          [value]="option.optionValue || option.optionText"
+                          [checked]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
+                          (change)="handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
+                          [disabled]="readonly">
+                        </ejs-radiobutton>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Radio Button -->
+                @if (question.questionTypeId === QuestionType.RadioButton) {
+                  <div class="options-container">
+                    @for (option of question.options; track option.optionId) {
+                      <div class="option-item">
+                        <ejs-radiobutton
+                          [label]="option.optionText"
+                          [name]="question.questionId"
+                          [value]="option.optionValue || option.optionText"
+                          [checked]="getQuestionValue(question.questionId) === (option.optionValue || option.optionText)"
+                          (change)="handleQuestionChange(question.questionId, option.optionValue || option.optionText)"
+                          [disabled]="readonly">
+                        </ejs-radiobutton>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Matrix -->
+                @if (question.questionTypeId === QuestionType.Matrix) {
+                  <div class="matrix-container">
+                    @if (question.rows?.length && question.cols?.length) {
+                      <div class="matrix-table-wrapper">
+                        <table class="matrix-table">
+                          <thead>
+                            <tr>
+                              <th class="matrix-header-cell"></th>
+                              @for (col of question.cols; track col.colId || col.colCode) {
+                                <th class="matrix-header-cell">{{ col.colLabel }}</th>
+                              }
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (row of question.rows; track row.rowId || row.rowCode) {
+                              <tr>
+                                <td class="matrix-row-label">{{ row.rowLabel }}</td>
+                                @for (col of question.cols; track col.colId || col.colCode) {
+                                  <td class="matrix-cell">
+                                    <input
+                                      type="radio"
+                                      [name]="question.questionId + '_' + (row.rowId || row.rowCode)"
+                                      [disabled]="readonly"
+                                      class="matrix-radio">
+                                  </td>
+                                }
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    } @else {
+                      <div class="matrix-empty-state">
+                        <span class="empty-icon">⚠️</span>
+                        <p>Matrix not configured. Add rows and columns in the editor.</p>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Table -->
+                @if (question.questionTypeId === QuestionType.Table) {
+                  <div class="table-container">
+                    @if (question.tableConfig?.rows?.length && question.tableConfig?.columns?.length) {
+                      <div class="data-table-wrapper">
+                        <table class="data-table">
+                          <thead>
+                            <tr>
+                              <th class="table-header-cell"></th>
+                              @for (col of question.tableConfig!.columns; track col.columnId) {
+                                <th class="table-header-cell">{{ col.columnLabel }}</th>
+                              }
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (row of question.tableConfig!.rows; track row.rowId) {
+                              <tr>
+                                <td class="table-row-label">{{ row.rowLabel }}</td>
+                                @for (col of question.tableConfig!.columns; track col.columnId) {
+                                  <td class="table-cell">
+                                    @switch (col.inputType) {
+                                      @case ('text') {
+                                        <input type="text" class="table-input" [disabled]="readonly" placeholder="...">
+                                      }
+                                      @case ('number') {
+                                        <input type="number" class="table-input" [disabled]="readonly" placeholder="0">
+                                      }
+                                      @case ('radio') {
+                                        <input type="radio" [name]="question.questionId + '_' + row.rowId" [disabled]="readonly">
+                                      }
+                                      @case ('checkbox') {
+                                        <input type="checkbox" [disabled]="readonly">
+                                      }
+                                      @case ('dropdown') {
+                                        <select class="table-select" [disabled]="readonly">
+                                          <option value="">Select...</option>
+                                          @for (opt of col.options || []; track opt.optionId) {
+                                            <option [value]="opt.optionValue">{{ opt.optionText }}</option>
+                                          }
+                                        </select>
+                                      }
+                                      @default {
+                                        <input type="text" class="table-input" [disabled]="readonly" placeholder="...">
+                                      }
+                                    }
+                                  </td>
+                                }
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    } @else {
+                      <div class="table-empty-state">
+                        <span class="empty-icon">📊</span>
+                        <p>Table not configured. Add rows and columns in the editor.</p>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Rich Text Block (Display Only) -->
+                @if (question.questionTypeId === QuestionType.RichTextBlock) {
+                  <div class="richtext-block" [innerHTML]="question.questionText"></div>
+                }
+
+                <!-- Display (Info Text) -->
+                @if (question.questionTypeId === QuestionType.Display) {
+                  <div class="display-block" [innerHTML]="question.questionText"></div>
+                }
+
+                <!-- Calculated Field -->
+                @if (question.questionTypeId === QuestionType.Calculated) {
+                  <div class="calculated-field">
+                    <div class="calculated-value">
+                      <span class="calc-icon">🔢</span>
+                      <span class="calc-result">{{ getQuestionValue(question.questionId) || '—' }}</span>
+                    </div>
+                    @if (question.calculationExpression) {
+                      <p class="calc-formula">Formula: {{ question.calculationExpression }}</p>
                     }
                   </div>
                 }
@@ -222,6 +368,7 @@
                   <div class="error-message">{{ getError(question.questionId) }}</div>
                 }
               </div>
+              } <!-- End of hidden field check -->
             }
           </div>
         </div>

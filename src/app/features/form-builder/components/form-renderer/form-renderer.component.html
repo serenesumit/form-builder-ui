@@ -64,7 +64,7 @@
                   }
 
                   <!-- Radio Button -->
-                  @if (question.questionTypeId === QuestionType.Radio) {
+                  @if (question.questionTypeId === QuestionType.RadioButton) {
                     <div class="radio-group">
                       @for (option of question.options; track $index) {
                         <ejs-radiobutton
@@ -75,6 +75,41 @@
                           (change)="setQuestionValue(getQuestionId($index, $index), option.optionValue || option.optionText)">
                         </ejs-radiobutton>
                       }
+                    </div>
+                  }
+
+                  <!-- Multiple Choice -->
+                  @if (question.questionTypeId === QuestionType.MultipleChoice) {
+                    <div class="radio-group">
+                      @for (option of question.options; track $index) {
+                        <ejs-radiobutton
+                          [label]="option.optionText"
+                          [name]="getQuestionId($index, $index)"
+                          [value]="option.optionValue || option.optionText"
+                          [checked]="getQuestionValue(getQuestionId($index, $index)) === (option.optionValue || option.optionText)"
+                          (change)="setQuestionValue(getQuestionId($index, $index), option.optionValue || option.optionText)">
+                        </ejs-radiobutton>
+                      }
+                    </div>
+                  }
+
+                  <!-- Yes/No -->
+                  @if (question.questionTypeId === QuestionType.YesNo) {
+                    <div class="yesno-group">
+                      <ejs-radiobutton
+                        label="Yes"
+                        [name]="getQuestionId($index, $index) + '_yesno'"
+                        value="true"
+                        [checked]="getQuestionValue(getQuestionId($index, $index)) === 'true' || getQuestionValue(getQuestionId($index, $index)) === true"
+                        (change)="setQuestionValue(getQuestionId($index, $index), true)">
+                      </ejs-radiobutton>
+                      <ejs-radiobutton
+                        label="No"
+                        [name]="getQuestionId($index, $index) + '_yesno'"
+                        value="false"
+                        [checked]="getQuestionValue(getQuestionId($index, $index)) === 'false' || getQuestionValue(getQuestionId($index, $index)) === false"
+                        (change)="setQuestionValue(getQuestionId($index, $index), false)">
+                      </ejs-radiobutton>
                     </div>
                   }
 
@@ -136,28 +171,19 @@
                     </ejs-numerictextbox>
                   }
 
-                  <!-- Email -->
-                  @if (question.questionTypeId === QuestionType.Email) {
-                    <ejs-textbox
-                      [id]="getQuestionId($index, $index)"
-                      type="email"
-                      [placeholder]="question.placeholderText || 'Enter email'"
-                      [value]="getQuestionValue(getQuestionId($index, $index))"
-                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
-                      floatLabelType="Never">
-                    </ejs-textbox>
-                  }
-
-                  <!-- Phone -->
-                  @if (question.questionTypeId === QuestionType.Phone) {
-                    <ejs-textbox
-                      [id]="getQuestionId($index, $index)"
-                      type="tel"
-                      [placeholder]="question.placeholderText || 'Enter phone number'"
-                      [value]="getQuestionValue(getQuestionId($index, $index))"
-                      (input)="setQuestionValue(getQuestionId($index, $index), $any($event.target).value)"
-                      floatLabelType="Never">
-                    </ejs-textbox>
+                  <!-- Scale/Rating -->
+                  @if (question.questionTypeId === QuestionType.Scale) {
+                    <div class="scale-group">
+                      @for (num of getScaleOptions(question); track num) {
+                        <button
+                          type="button"
+                          class="scale-option"
+                          [class.selected]="getQuestionValue(getQuestionId($index, $index)) === num"
+                          (click)="setQuestionValue(getQuestionId($index, $index), num)">
+                          {{ num }}
+                        </button>
+                      }
+                    </div>
                   }
 
                   <!-- Dropdown -->

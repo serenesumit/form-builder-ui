@@ -64,4 +64,14 @@ export class FormRendererComponent {
   getDropdownFields() {
     return { text: 'optionText', value: 'optionValue' };
   }
+
+  getScaleOptions(question: FormQuestionRequest): number[] {
+    const min = question.minValue ?? 1;
+    const max = question.maxValue ?? 5;
+    const options: number[] = [];
+    for (let i = min; i <= max; i++) {
+      options.push(i);
+    }
+    return options;
+  }
 }

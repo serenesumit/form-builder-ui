@@ -149,10 +149,11 @@ export class FormPreviewComponent implements OnInit {
    */
   supportsOptions(questionTypeId: number): boolean {
     return [
-      QuestionType.Radio,
+      QuestionType.MultipleChoice,
       QuestionType.Checkbox,
       QuestionType.Dropdown,
-      QuestionType.Rating
+      QuestionType.RadioButton,
+      QuestionType.Scale
     ].includes(questionTypeId);
   }
 
@@ -182,5 +183,29 @@ export class FormPreviewComponent implements OnInit {
   isCheckboxSelected(questionId: string, optionValue: string): boolean {
     const values = this.formData()[questionId] || [];
     return values.includes(optionValue);
+  }
+
+  /**
+   * Get scale options based on min/max values
+   */
+  getScaleOptions(question: FormBuilderQuestionDto): number[] {
+    const min = question.minValue ?? 1;
+    const max = question.maxValue ?? 5;
+    const options: number[] = [];
+    for (let i = min; i <= max; i++) {
+      options.push(i);
+    }
+    return options;
+  }
+
+  /**
+   * Check if question is a display-only type (no label needed)
+   */
+  isDisplayOnlyType(questionTypeId: number): boolean {
+    return [
+      QuestionType.RichTextBlock,
+      QuestionType.Display,
+      QuestionType.Hidden
+    ].includes(questionTypeId);
   }
 }

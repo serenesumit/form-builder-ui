@@ -219,24 +219,6 @@ export const PALETTE_CATEGORIES: PaletteCategory[] = [
         icon: 'pin',
         category: 'basic',
         defaultConfig: { questionText: 'Number Question', placeholderText: '0' }
-      },
-      {
-        id: 'email',
-        questionTypeId: QuestionType.Email,
-        name: 'Email',
-        description: 'Email address',
-        icon: 'email',
-        category: 'basic',
-        defaultConfig: { questionText: 'Email Address', placeholderText: 'email@example.com' }
-      },
-      {
-        id: 'phone',
-        questionTypeId: QuestionType.Phone,
-        name: 'Phone',
-        description: 'Phone number',
-        icon: 'phone',
-        category: 'basic',
-        defaultConfig: { questionText: 'Phone Number', placeholderText: '(555) 123-4567' }
       }
     ]
   },
@@ -247,8 +229,17 @@ export const PALETTE_CATEGORIES: PaletteCategory[] = [
     expanded: true,
     items: [
       {
+        id: 'yesno',
+        questionTypeId: QuestionType.YesNo,
+        name: 'Yes/No',
+        description: 'Yes/No toggle',
+        icon: 'toggle_on',
+        category: 'selection',
+        defaultConfig: { questionText: 'Yes/No Question' }
+      },
+      {
         id: 'radio',
-        questionTypeId: QuestionType.Radio,
+        questionTypeId: QuestionType.RadioButton,
         name: 'Radio Buttons',
         description: 'Single selection',
         icon: 'radio_button_checked',
@@ -259,6 +250,22 @@ export const PALETTE_CATEGORIES: PaletteCategory[] = [
             { id: crypto.randomUUID(), text: 'Option 1', value: '1', displayOrder: 0 },
             { id: crypto.randomUUID(), text: 'Option 2', value: '2', displayOrder: 1 },
             { id: crypto.randomUUID(), text: 'Option 3', value: '3', displayOrder: 2 }
+          ]
+        }
+      },
+      {
+        id: 'multiplechoice',
+        questionTypeId: QuestionType.MultipleChoice,
+        name: 'Multiple Choice',
+        description: 'Single selection from list',
+        icon: 'check_circle',
+        category: 'selection',
+        defaultConfig: {
+          questionText: 'Multiple Choice Question',
+          options: [
+            { id: crypto.randomUUID(), text: 'Option A', value: 'a', displayOrder: 0 },
+            { id: crypto.randomUUID(), text: 'Option B', value: 'b', displayOrder: 1 },
+            { id: crypto.randomUUID(), text: 'Option C', value: 'c', displayOrder: 2 }
           ]
         }
       },
@@ -333,8 +340,8 @@ export const PALETTE_CATEGORIES: PaletteCategory[] = [
     ]
   },
   {
-    id: 'advanced',
-    name: 'Advanced Fields',
+    id: 'scale',
+    name: 'Scale & Rating',
     icon: 'star',
     expanded: false,
     items: [
@@ -344,26 +351,52 @@ export const PALETTE_CATEGORIES: PaletteCategory[] = [
         name: 'Slider',
         description: 'Numeric slider',
         icon: 'tune',
-        category: 'advanced',
+        category: 'scale',
         defaultConfig: { questionText: 'Slider Question', minValue: 0, maxValue: 100 }
       },
       {
-        id: 'rating',
-        questionTypeId: QuestionType.Rating,
-        name: 'Rating',
-        description: 'Star rating',
+        id: 'scale',
+        questionTypeId: QuestionType.Scale,
+        name: 'Rating Scale',
+        description: 'Rating scale (1-5, 1-10)',
         icon: 'star_rate',
+        category: 'scale',
+        defaultConfig: { questionText: 'Rating Question', minValue: 1, maxValue: 5 }
+      }
+    ]
+  },
+  {
+    id: 'advanced',
+    name: 'Advanced Fields',
+    icon: 'widgets',
+    expanded: false,
+    items: [
+      {
+        id: 'matrix',
+        questionTypeId: QuestionType.Matrix,
+        name: 'Matrix',
+        description: 'Grid with rows and columns',
+        icon: 'grid_on',
         category: 'advanced',
-        defaultConfig: {
-          questionText: 'Rating Question',
-          options: [
-            { id: crypto.randomUUID(), text: '1', value: '1', numericScore: 1, displayOrder: 0 },
-            { id: crypto.randomUUID(), text: '2', value: '2', numericScore: 2, displayOrder: 1 },
-            { id: crypto.randomUUID(), text: '3', value: '3', numericScore: 3, displayOrder: 2 },
-            { id: crypto.randomUUID(), text: '4', value: '4', numericScore: 4, displayOrder: 3 },
-            { id: crypto.randomUUID(), text: '5', value: '5', numericScore: 5, displayOrder: 4 }
-          ]
-        }
+        defaultConfig: { questionText: 'Matrix Question' }
+      },
+      {
+        id: 'table',
+        questionTypeId: QuestionType.Table,
+        name: 'Table',
+        description: 'Data table with configurable cells',
+        icon: 'table_chart',
+        category: 'advanced',
+        defaultConfig: { questionText: 'Table Question' }
+      },
+      {
+        id: 'calculated',
+        questionTypeId: QuestionType.Calculated,
+        name: 'Calculated',
+        description: 'Formula-based calculation',
+        icon: 'calculate',
+        category: 'advanced',
+        defaultConfig: { questionText: 'Calculated Field', isCalculated: true }
       },
       {
         id: 'file',
@@ -382,6 +415,41 @@ export const PALETTE_CATEGORIES: PaletteCategory[] = [
         icon: 'draw',
         category: 'advanced',
         defaultConfig: { questionText: 'Signature' }
+      }
+    ]
+  },
+  {
+    id: 'display',
+    name: 'Display Fields',
+    icon: 'info',
+    expanded: false,
+    items: [
+      {
+        id: 'richtext',
+        questionTypeId: QuestionType.RichTextBlock,
+        name: 'Rich Text Block',
+        description: 'Formatted text content',
+        icon: 'article',
+        category: 'display',
+        defaultConfig: { questionText: '<p>Enter rich text content here...</p>' }
+      },
+      {
+        id: 'display',
+        questionTypeId: QuestionType.Display,
+        name: 'Display Text',
+        description: 'Info text or header',
+        icon: 'info',
+        category: 'display',
+        defaultConfig: { questionText: 'Display information text' }
+      },
+      {
+        id: 'hidden',
+        questionTypeId: QuestionType.Hidden,
+        name: 'Hidden Field',
+        description: 'Hidden data field',
+        icon: 'visibility_off',
+        category: 'display',
+        defaultConfig: { questionText: 'Hidden Field' }
       }
     ]
   }
@@ -450,19 +518,25 @@ export function getQuestionTypeIcon(questionTypeId: number): string {
   const iconMap: Record<number, string> = {
     [QuestionType.Text]: 'text_fields',
     [QuestionType.TextArea]: 'notes',
-    [QuestionType.Radio]: 'radio_button_checked',
-    [QuestionType.Checkbox]: 'check_box',
-    [QuestionType.Date]: 'calendar_today',
-    [QuestionType.Time]: 'schedule',
-    [QuestionType.DateTime]: 'event',
     [QuestionType.Number]: 'pin',
-    [QuestionType.Email]: 'email',
-    [QuestionType.Phone]: 'phone',
+    [QuestionType.YesNo]: 'toggle_on',
+    [QuestionType.MultipleChoice]: 'check_circle',
+    [QuestionType.Checkbox]: 'check_box',
     [QuestionType.Dropdown]: 'arrow_drop_down_circle',
+    [QuestionType.RadioButton]: 'radio_button_checked',
+    [QuestionType.Date]: 'calendar_today',
+    [QuestionType.DateTime]: 'event',
+    [QuestionType.Time]: 'schedule',
     [QuestionType.Slider]: 'tune',
-    [QuestionType.Rating]: 'star_rate',
+    [QuestionType.Scale]: 'star_rate',
     [QuestionType.FileUpload]: 'upload_file',
-    [QuestionType.Signature]: 'draw'
+    [QuestionType.Signature]: 'draw',
+    [QuestionType.Matrix]: 'grid_on',
+    [QuestionType.Calculated]: 'calculate',
+    [QuestionType.Display]: 'info',
+    [QuestionType.Hidden]: 'visibility_off',
+    [QuestionType.RichTextBlock]: 'article',
+    [QuestionType.Table]: 'table_chart'
   };
   return iconMap[questionTypeId] || 'help_outline';
 }
@@ -471,29 +545,36 @@ export function getQuestionTypeName(questionTypeId: number): string {
   const nameMap: Record<number, string> = {
     [QuestionType.Text]: 'Text Input',
     [QuestionType.TextArea]: 'Text Area',
-    [QuestionType.Radio]: 'Radio Buttons',
-    [QuestionType.Checkbox]: 'Checkboxes',
-    [QuestionType.Date]: 'Date Picker',
-    [QuestionType.Time]: 'Time Picker',
-    [QuestionType.DateTime]: 'Date & Time',
     [QuestionType.Number]: 'Number',
-    [QuestionType.Email]: 'Email',
-    [QuestionType.Phone]: 'Phone',
+    [QuestionType.YesNo]: 'Yes/No',
+    [QuestionType.MultipleChoice]: 'Multiple Choice',
+    [QuestionType.Checkbox]: 'Checkboxes',
     [QuestionType.Dropdown]: 'Dropdown',
+    [QuestionType.RadioButton]: 'Radio Buttons',
+    [QuestionType.Date]: 'Date Picker',
+    [QuestionType.DateTime]: 'Date & Time',
+    [QuestionType.Time]: 'Time Picker',
     [QuestionType.Slider]: 'Slider',
-    [QuestionType.Rating]: 'Rating',
+    [QuestionType.Scale]: 'Rating Scale',
     [QuestionType.FileUpload]: 'File Upload',
-    [QuestionType.Signature]: 'Signature'
+    [QuestionType.Signature]: 'Signature',
+    [QuestionType.Matrix]: 'Matrix',
+    [QuestionType.Calculated]: 'Calculated',
+    [QuestionType.Display]: 'Display Text',
+    [QuestionType.Hidden]: 'Hidden Field',
+    [QuestionType.RichTextBlock]: 'Rich Text Block',
+    [QuestionType.Table]: 'Table'
   };
   return nameMap[questionTypeId] || 'Unknown';
 }
 
 export function questionTypeSupportsOptions(questionTypeId: number): boolean {
   return [
-    QuestionType.Radio,
+    QuestionType.MultipleChoice,
     QuestionType.Checkbox,
     QuestionType.Dropdown,
-    QuestionType.Rating
+    QuestionType.RadioButton,
+    QuestionType.Scale
   ].includes(questionTypeId);
 }
 

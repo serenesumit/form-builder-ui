@@ -208,6 +208,13 @@ export interface FormBuilderQuestionDto {
   options: FormBuilderOptionDto[];
   conditionalRules?: FormBuilderConditionalRuleDto[];
   validationRules?: FormBuilderValidationRuleDto[];
+
+  // Matrix configuration (legacy)
+  rows?: FormBuilderMatrixRowRequest[];
+  cols?: FormBuilderMatrixColRequest[];
+
+  // Table configuration (new)
+  tableConfig?: TableConfig;
 }
 
 export interface FormBuilderOptionDto {
@@ -257,49 +264,104 @@ export type ConditionalActionType =
 
 export type ConditionalJoinType = 'AND' | 'OR';
 
-// Question Types Reference
+// Question Types Reference (matching database IDs 1-21)
 export enum QuestionType {
   Text = 1,
   TextArea = 2,
-  Radio = 3,
-  Checkbox = 4,
-  Date = 5,
-  Time = 6,
-  DateTime = 7,
-  Number = 8,
-  Email = 9,
-  Phone = 10,
-  Dropdown = 11,
+  Number = 3,
+  YesNo = 4,
+  MultipleChoice = 5,
+  Checkbox = 6,
+  Dropdown = 7,
+  RadioButton = 8,
+  Date = 9,
+  DateTime = 10,
+  Time = 11,
   Slider = 12,
-  Rating = 13,
+  Scale = 13,
   FileUpload = 14,
-  Signature = 15
+  Signature = 15,
+  Matrix = 16,
+  Calculated = 17,
+  Display = 18,
+  Hidden = 19,
+  RichTextBlock = 20,
+  Table = 21
 }
+
+// Legacy mappings for backward compatibility
+export const LegacyQuestionType = {
+  Radio: QuestionType.RadioButton,
+  Email: QuestionType.Text,  // Use text with validation
+  Phone: QuestionType.Text,  // Use text with validation
+  Rating: QuestionType.Scale
+};
+
+export type QuestionTypeCategory = 'Input' | 'Selection' | 'DateTime' | 'Scale' | 'Advanced' | 'Display';
 
 export interface QuestionTypeInfo {
   id: number;
   name: string;
   description: string;
+  category: QuestionTypeCategory;
   supportsOptions: boolean;
+  icon?: string;
 }
 
 export const QUESTION_TYPES: QuestionTypeInfo[] = [
-  { id: 1, name: 'Text', description: 'Single-line text input', supportsOptions: false },
-  { id: 2, name: 'TextArea', description: 'Multi-line text input', supportsOptions: false },
-  { id: 3, name: 'Radio', description: 'Single selection from options', supportsOptions: true },
-  { id: 4, name: 'Checkbox', description: 'Multiple selections from options', supportsOptions: true },
-  { id: 5, name: 'Date', description: 'Date picker', supportsOptions: false },
-  { id: 6, name: 'Time', description: 'Time picker', supportsOptions: false },
-  { id: 7, name: 'DateTime', description: 'Date and time picker', supportsOptions: false },
-  { id: 8, name: 'Number', description: 'Numeric input', supportsOptions: false },
-  { id: 9, name: 'Email', description: 'Email input with validation', supportsOptions: false },
-  { id: 10, name: 'Phone', description: 'Phone number input', supportsOptions: false },
-  { id: 11, name: 'Dropdown', description: 'Dropdown selection', supportsOptions: true },
-  { id: 12, name: 'Slider', description: 'Numeric slider', supportsOptions: false },
-  { id: 13, name: 'Rating', description: 'Star or numeric rating', supportsOptions: true },
-  { id: 14, name: 'FileUpload', description: 'File upload', supportsOptions: false },
-  { id: 15, name: 'Signature', description: 'Digital signature', supportsOptions: false }
+  // Input Types
+  { id: 1, name: 'Text', description: 'Single-line text input', category: 'Input', supportsOptions: false, icon: 'text' },
+  { id: 2, name: 'TextArea', description: 'Multi-line text input', category: 'Input', supportsOptions: false, icon: 'textarea' },
+  { id: 3, name: 'Number', description: 'Numeric input', category: 'Input', supportsOptions: false, icon: 'number' },
+
+  // Selection Types
+  { id: 4, name: 'YesNo', description: 'Yes/No toggle', category: 'Selection', supportsOptions: false, icon: 'toggle' },
+  { id: 5, name: 'MultipleChoice', description: 'Single selection from options', category: 'Selection', supportsOptions: true, icon: 'list' },
+  { id: 6, name: 'Checkbox', description: 'Multiple selections from options', category: 'Selection', supportsOptions: true, icon: 'checkbox' },
+  { id: 7, name: 'Dropdown', description: 'Dropdown selection', category: 'Selection', supportsOptions: true, icon: 'dropdown' },
+  { id: 8, name: 'RadioButton', description: 'Radio button selection', category: 'Selection', supportsOptions: true, icon: 'radio' },
+
+  // DateTime Types
+  { id: 9, name: 'Date', description: 'Date picker', category: 'DateTime', supportsOptions: false, icon: 'calendar' },
+  { id: 10, name: 'DateTime', description: 'Date and time picker', category: 'DateTime', supportsOptions: false, icon: 'datetime' },
+  { id: 11, name: 'Time', description: 'Time picker', category: 'DateTime', supportsOptions: false, icon: 'clock' },
+
+  // Scale Types
+  { id: 12, name: 'Slider', description: 'Numeric slider', category: 'Scale', supportsOptions: false, icon: 'slider' },
+  { id: 13, name: 'Scale', description: 'Rating scale (1-5, 1-10, etc.)', category: 'Scale', supportsOptions: false, icon: 'star' },
+
+  // Advanced Types
+  { id: 14, name: 'FileUpload', description: 'File upload', category: 'Advanced', supportsOptions: false, icon: 'upload' },
+  { id: 15, name: 'Signature', description: 'Digital signature', category: 'Advanced', supportsOptions: false, icon: 'pen' },
+  { id: 16, name: 'Matrix', description: 'Matrix/Grid with rows and columns', category: 'Advanced', supportsOptions: false, icon: 'grid' },
+  { id: 17, name: 'Calculated', description: 'Calculated field (formula-based)', category: 'Advanced', supportsOptions: false, icon: 'calculator' },
+  { id: 21, name: 'Table', description: 'Data table with configurable cells', category: 'Advanced', supportsOptions: false, icon: 'table' },
+
+  // Display Types
+  { id: 18, name: 'Display', description: 'Display-only text/HTML content', category: 'Display', supportsOptions: false, icon: 'info' },
+  { id: 19, name: 'Hidden', description: 'Hidden field', category: 'Display', supportsOptions: false, icon: 'hidden' },
+  { id: 20, name: 'RichTextBlock', description: 'Rich text content block', category: 'Display', supportsOptions: false, icon: 'richtext' }
 ];
+
+// Table Configuration Interfaces
+export interface TableRowConfig {
+  rowId?: string;
+  rowLabel: string;
+  sortOrder: number;
+}
+
+export interface TableColumnConfig {
+  columnId?: string;
+  columnLabel: string;
+  sortOrder: number;
+  inputType: 'text' | 'number' | 'radio' | 'checkbox' | 'dropdown';
+  options?: FormBuilderOptionDto[]; // For dropdown column types
+}
+
+export interface TableConfig {
+  rows: TableRowConfig[];
+  columns: TableColumnConfig[];
+}
 
 // API Error Response
 export interface ApiError {
