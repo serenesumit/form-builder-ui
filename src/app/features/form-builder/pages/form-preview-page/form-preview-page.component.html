@@ -46,25 +46,121 @@
         </div>
       </div>
 
-      <!-- Version Info -->
-      @if (versionId()) {
-        <div class="version-info">
-          <svg class="version-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
-          <span class="version-text">Latest Version</span>
+      <div class="header-right">
+        <!-- Version Selector -->
+        <div class="version-selector">
+          <label class="version-label">
+            <svg class="version-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            Version:
+          </label>
+          @if (versions().length > 0) {
+            <ejs-dropdownlist
+              cssClass="version-dropdown"
+              [dataSource]="versions()"
+              [fields]="versionFields"
+              [value]="selectedVersionId()"
+              (change)="onVersionChange($event)"
+              [placeholder]="isLoadingVersions() ? 'Loading versions...' : 'Select version'"
+              [enabled]="!isLoadingVersions()"
+              width="280">
+            </ejs-dropdownlist>
+          } @else if (isLoadingVersions()) {
+            <span class="version-loading">Loading versions...</span>
+          } @else {
+            <span class="version-text">{{ getSelectedVersionInfo()?.versionNumber ? 'v' + getSelectedVersionInfo()?.versionNumber : 'Latest' }}</span>
+          }
         </div>
-      }
+
+        <!-- Version Status Badge -->
+        @if (getSelectedVersionInfo()) {
+          <div class="version-status-badge"
+               [class.published]="getSelectedVersionInfo()?.status === 'Published'"
+               [class.draft]="getSelectedVersionInfo()?.status === 'Draft'"
+               [class.archived]="getSelectedVersionInfo()?.status === 'Archived'"
+               [class.retired]="getSelectedVersionInfo()?.status === 'Retired'">
+            {{ getSelectedVersionInfo()?.status }}
+          </div>
+        }
+
+        <!-- View Mode Toggle -->
+        <div class="view-mode-toggle">
+          <button
+            class="view-mode-btn"
+            [class.active]="viewMode() === 'scroll'"
+            (click)="setViewMode('scroll')"
+            title="Scroll View">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+            <span>Scroll</span>
+          </button>
+          <button
+            class="view-mode-btn"
+            [class.active]="viewMode() === 'tabs'"
+            (click)="setViewMode('tabs')"
+            title="Tabs View">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h4v4H4zM10 6h4v4h-4zM16 6h4v4h-4zM4 14h16v6H4z"/>
+            </svg>
+            <span>Tabs</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Form Preview Content -->
-    <div class="preview-content">
+    <div class="preview-content" [class.tabs-mode]="viewMode() === 'tabs'">
       @if (formDefinition()) {
-        <app-form-preview
-          [sections]="getSections()"
-          [questions]="getQuestions()"
-          [readonly]="true">
-        </app-form-preview>
+        <!-- Scroll View Mode -->
+        @if (viewMode() === 'scroll') {
+          <div class="scroll-view-container">
+            <app-form-preview
+              [sections]="getSections()"
+              [questions]="getQuestions()"
+              [readonly]="true">
+            </app-form-preview>
+          </div>
+        }
+
+        <!-- Tabs View Mode -->
+        @if (viewMode() === 'tabs') {
+          <div class="tabs-view-container">
+            @if (getSections().length > 0) {
+              <ejs-tab
+                cssClass="preview-tabs"
+                [selectedItem]="selectedTabIndex()"
+                (selected)="onTabSelected($event)">
+                <e-tabitems>
+                  @for (section of getSections(); track section.sectionId) {
+                    <e-tabitem>
+                      <ng-template #headerText>
+                        <div class="tab-header">{{ section.sectionName }}</div>
+                      </ng-template>
+                      <ng-template #content>
+                        <div class="tab-content">
+                          <app-form-preview
+                            [sections]="[section]"
+                            [questions]="getSectionQuestions(section.sectionId)"
+                            [readonly]="true">
+                          </app-form-preview>
+                        </div>
+                      </ng-template>
+                    </e-tabitem>
+                  }
+                </e-tabitems>
+              </ejs-tab>
+            } @else {
+              <div class="no-sections">
+                <p>No sections available for tabs view.</p>
+                <button class="switch-to-scroll" (click)="setViewMode('scroll')">
+                  Switch to Scroll View
+                </button>
+              </div>
+            }
+          </div>
+        }
       } @else {
         <div class="no-data">
           <p class="no-data-text">No form data available</p>
