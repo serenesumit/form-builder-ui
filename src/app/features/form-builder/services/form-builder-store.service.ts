@@ -6,6 +6,8 @@ import {
   CanvasQuestion,
   CanvasQuestionOption,
   CanvasConditionalRule,
+  CanvasTableRow,
+  CanvasTableCol,
   FormBuilderSelection,
   FormBuilderDragState,
   DragItem,
@@ -21,6 +23,8 @@ import {
   FormQuestionRequest,
   FormQuestionOptionRequest,
   FormBuilderConditionalRuleRequest,
+  FormBuilderMatrixRowRequest,
+  FormBuilderMatrixColRequest,
   FormBuilderDto,
   FormBuilderSectionDto,
   FormBuilderQuestionDto
@@ -209,6 +213,20 @@ export class FormBuilderStoreService {
         compareToQuestionId: rule.compareToQuestionId,
         actionType: rule.actionType as any,
         sortOrder: rule.sortOrder
+      })) || [],
+      // Table/Matrix rows and columns
+      rows: apiQuestion.rows?.map((row, rowIndex) => ({
+        rowId: row.rowId || generateId(),
+        rowCode: row.rowCode || `ROW_${rowIndex + 1}`,
+        rowLabel: row.rowLabel,
+        sortOrder: row.sortOrder ?? rowIndex
+      })) || [],
+      cols: apiQuestion.cols?.map((col, colIndex) => ({
+        colId: col.colId || generateId(),
+        colCode: col.colCode || `COL_${colIndex + 1}`,
+        colLabel: col.colLabel,
+        sortOrder: col.sortOrder ?? colIndex,
+        inputType: (col.inputType as any) || 'text'
       })) || []
     };
   }
@@ -704,8 +722,8 @@ export class FormBuilderStoreService {
       options: question.options.map((opt, i) => this.convertOption(opt, i)),
       conditionalRules: question.conditionalRules.map((rule, i) => this.convertConditionalRule(rule, i)),
       validationRules: [], // TODO: Implement when validation rules UI is added
-      rows: [], // TODO: Implement when matrix question UI is added
-      cols: []  // TODO: Implement when matrix question UI is added
+      rows: (question.rows || []).map((row, i) => this.convertTableRow(row, i)),
+      cols: (question.cols || []).map((col, i) => this.convertTableCol(col, i))
     };
   }
 
@@ -730,6 +748,25 @@ export class FormBuilderStoreService {
       optionValue: option.value,
       numericScore: option.numericScore ?? null,
       displayOrder: index
+    };
+  }
+
+  private convertTableRow(row: CanvasTableRow, index: number): FormBuilderMatrixRowRequest {
+    return {
+      rowId: row.rowId,
+      rowCode: row.rowCode,
+      rowLabel: row.rowLabel,
+      sortOrder: index
+    };
+  }
+
+  private convertTableCol(col: CanvasTableCol, index: number): FormBuilderMatrixColRequest {
+    return {
+      colId: col.colId,
+      colCode: col.colCode,
+      colLabel: col.colLabel,
+      sortOrder: index,
+      inputType: col.inputType || 'text'
     };
   }
 

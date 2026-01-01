@@ -20,11 +20,13 @@ export class TableEditorComponent {
   defaultInputType: 'text' | 'number' | 'radio' | 'checkbox' | 'dropdown' = 'text';
 
   get rows(): CanvasTableRow[] {
-    return (this.question as any).tableRows || [];
+    // API uses 'rows' property
+    return (this.question as any).rows || [];
   }
 
   get columns(): CanvasTableCol[] {
-    return (this.question as any).tableCols || [];
+    // API uses 'cols' property
+    return (this.question as any).cols || [];
   }
 
   setActiveTab(tab: TableEditorTab): void {
@@ -44,20 +46,21 @@ export class TableEditorComponent {
       rowLabel: `Row ${this.rows.length + 1}`,
       sortOrder: this.rows.length
     };
-    this.questionChange.emit({ tableRows: [...this.rows, newRow] } as any);
+    // Emit using 'rows' to match API structure
+    this.questionChange.emit({ rows: [...this.rows, newRow] } as any);
   }
 
   updateRow(index: number, field: keyof CanvasTableRow, value: string | number): void {
     const updatedRows = [...this.rows];
     updatedRows[index] = { ...updatedRows[index], [field]: value };
     updatedRows.forEach((row, i) => row.sortOrder = i);
-    this.questionChange.emit({ tableRows: updatedRows } as any);
+    this.questionChange.emit({ rows: updatedRows } as any);
   }
 
   deleteRow(index: number): void {
     const updatedRows = this.rows.filter((_, i) => i !== index);
     updatedRows.forEach((row, i) => row.sortOrder = i);
-    this.questionChange.emit({ tableRows: updatedRows } as any);
+    this.questionChange.emit({ rows: updatedRows } as any);
   }
 
   moveRow(index: number, direction: 'up' | 'down'): void {
@@ -67,7 +70,7 @@ export class TableEditorComponent {
     const updatedRows = [...this.rows];
     [updatedRows[index], updatedRows[newIndex]] = [updatedRows[newIndex], updatedRows[index]];
     updatedRows.forEach((row, i) => row.sortOrder = i);
-    this.questionChange.emit({ tableRows: updatedRows } as any);
+    this.questionChange.emit({ rows: updatedRows } as any);
   }
 
   // Column Management
@@ -79,20 +82,21 @@ export class TableEditorComponent {
       sortOrder: this.columns.length,
       inputType: this.defaultInputType
     };
-    this.questionChange.emit({ tableCols: [...this.columns, newCol] } as any);
+    // Emit using 'cols' to match API structure
+    this.questionChange.emit({ cols: [...this.columns, newCol] } as any);
   }
 
   updateColumn(index: number, field: keyof CanvasTableCol, value: string | number): void {
     const updatedCols = [...this.columns];
     updatedCols[index] = { ...updatedCols[index], [field]: value };
     updatedCols.forEach((col, i) => col.sortOrder = i);
-    this.questionChange.emit({ tableCols: updatedCols } as any);
+    this.questionChange.emit({ cols: updatedCols } as any);
   }
 
   deleteColumn(index: number): void {
     const updatedCols = this.columns.filter((_, i) => i !== index);
     updatedCols.forEach((col, i) => col.sortOrder = i);
-    this.questionChange.emit({ tableCols: updatedCols } as any);
+    this.questionChange.emit({ cols: updatedCols } as any);
   }
 
   moveColumn(index: number, direction: 'up' | 'down'): void {
@@ -102,7 +106,7 @@ export class TableEditorComponent {
     const updatedCols = [...this.columns];
     [updatedCols[index], updatedCols[newIndex]] = [updatedCols[newIndex], updatedCols[index]];
     updatedCols.forEach((col, i) => col.sortOrder = i);
-    this.questionChange.emit({ tableCols: updatedCols } as any);
+    this.questionChange.emit({ cols: updatedCols } as any);
   }
 
   getCellCount(): number {

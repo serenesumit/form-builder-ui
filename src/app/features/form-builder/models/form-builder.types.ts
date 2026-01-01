@@ -100,6 +100,10 @@ export interface CanvasQuestion {
   isCalculated: boolean;
   calculationFormula?: string;
   defaultValue?: string;
+  
+  // Table/Matrix configuration (matches API structure)
+  rows?: CanvasTableRow[];
+  cols?: CanvasTableCol[];
 }
 
 export interface CanvasQuestionOption {
@@ -527,7 +531,10 @@ export function createDefaultQuestion(
     snomedCode: defaults?.snomedCode || '',
     isCalculated: defaults?.isCalculated ?? false,
     calculationFormula: defaults?.calculationFormula || '',
-    defaultValue: defaults?.defaultValue || ''
+    defaultValue: defaults?.defaultValue || '',
+    // Table/Matrix configuration
+    rows: defaults?.rows || [],
+    cols: defaults?.cols || []
   };
 }
 
