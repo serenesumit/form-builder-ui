@@ -1,0 +1,324 @@
+<div class="matrix-editor">
+  <!-- Help Info -->
+  <div class="help-info">
+    <span class="material-icons">info</span>
+    <div class="help-content">
+      <h4>How to Configure Matrix</h4>
+      <ol>
+        <li>Choose <strong>Input Type</strong> - The type of input for all cells</li>
+        <li>Add <strong>Rows</strong> - These appear on the left side</li>
+        <li>Add <strong>Columns</strong> - These appear across the top</li>
+        <li>Check <strong>Preview</strong> to see the result</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Matrix Input Type Selector -->
+  <div class="input-type-selector">
+    <label>Matrix Input Type</label>
+    <div class="type-buttons">
+      <button
+        type="button"
+        [class.active]="matrixInputType === 'radio'"
+        (click)="setMatrixInputType('radio')">
+        <span class="material-icons">radio_button_checked</span>
+        <span>Radio</span>
+      </button>
+      <button
+        type="button"
+        [class.active]="matrixInputType === 'checkbox'"
+        (click)="setMatrixInputType('checkbox')">
+        <span class="material-icons">check_box</span>
+        <span>Checkbox</span>
+      </button>
+      <button
+        type="button"
+        [class.active]="matrixInputType === 'text'"
+        (click)="setMatrixInputType('text')">
+        <span class="material-icons">text_fields</span>
+        <span>Text</span>
+      </button>
+      <button
+        type="button"
+        [class.active]="matrixInputType === 'number'"
+        (click)="setMatrixInputType('number')">
+        <span class="material-icons">pin</span>
+        <span>Number</span>
+      </button>
+      <button
+        type="button"
+        [class.active]="matrixInputType === 'dropdown'"
+        (click)="setMatrixInputType('dropdown')">
+        <span class="material-icons">arrow_drop_down_circle</span>
+        <span>Dropdown</span>
+      </button>
+    </div>
+    <span class="hint">This input type will be used for all cells in the matrix</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="editor-tabs">
+    <button
+      type="button"
+      [class.active]="activeTab === 'rows'"
+      (click)="setActiveTab('rows')">
+      <span class="material-icons">table_rows</span>
+      Rows ({{ rows.length }})
+    </button>
+    <button
+      type="button"
+      [class.active]="activeTab === 'columns'"
+      (click)="setActiveTab('columns')">
+      <span class="material-icons">view_column</span>
+      Columns ({{ columns.length }})
+    </button>
+    <button
+      type="button"
+      [class.active]="activeTab === 'preview'"
+      (click)="setActiveTab('preview')">
+      <span class="material-icons">visibility</span>
+      Preview
+    </button>
+  </div>
+
+  <!-- Rows Tab -->
+  @if (activeTab === 'rows') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <div>
+          <h4>Matrix Rows</h4>
+          <p>Rows appear on the left side of the matrix</p>
+        </div>
+        <button type="button" class="add-btn" (click)="addRow()">
+          <span class="material-icons">add</span>
+          Add Row
+        </button>
+      </div>
+
+      <div class="items-list">
+        @for (row of rows; track row.rowId; let i = $index) {
+          <div class="item-card">
+            <div class="item-controls">
+              <button
+                type="button"
+                [disabled]="i === 0"
+                (click)="moveRow(i, 'up')"
+                title="Move up">
+                <span class="material-icons">expand_less</span>
+              </button>
+              <button
+                type="button"
+                [disabled]="i === rows.length - 1"
+                (click)="moveRow(i, 'down')"
+                title="Move down">
+                <span class="material-icons">expand_more</span>
+              </button>
+            </div>
+            <div class="item-fields">
+              <input
+                type="text"
+                [value]="row.rowLabel"
+                (input)="updateRow(i, 'rowLabel', $any($event.target).value)"
+                placeholder="Row label (e.g., 'Item 1', 'Question A')">
+              <input
+                type="text"
+                [value]="row.rowCode"
+                (input)="updateRow(i, 'rowCode', $any($event.target).value)"
+                placeholder="Row code (e.g., 'ROW_1')"
+                class="code-input">
+            </div>
+            <button
+              type="button"
+              class="delete-btn"
+              (click)="deleteRow(i)"
+              title="Delete row">
+              <span class="material-icons">delete_outline</span>
+            </button>
+          </div>
+        }
+
+        @if (rows.length === 0) {
+          <div class="empty-state">
+            <span class="material-icons">table_rows</span>
+            <p>No rows added yet</p>
+            <span>Click "Add Row" to get started</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Columns Tab -->
+  @if (activeTab === 'columns') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <div>
+          <h4>Matrix Columns</h4>
+          <p>Columns appear across the top of the matrix</p>
+        </div>
+        <button type="button" class="add-btn" (click)="addColumn()">
+          <span class="material-icons">add</span>
+          Add Column
+        </button>
+      </div>
+
+      <div class="items-list">
+        @for (col of columns; track col.colId; let i = $index) {
+          <div class="item-card">
+            <div class="item-controls">
+              <button
+                type="button"
+                [disabled]="i === 0"
+                (click)="moveColumn(i, 'up')"
+                title="Move left">
+                <span class="material-icons">chevron_left</span>
+              </button>
+              <button
+                type="button"
+                [disabled]="i === columns.length - 1"
+                (click)="moveColumn(i, 'down')"
+                title="Move right">
+                <span class="material-icons">chevron_right</span>
+              </button>
+            </div>
+            <div class="item-fields">
+              <input
+                type="text"
+                [value]="col.colLabel"
+                (input)="updateColumn(i, 'colLabel', $any($event.target).value)"
+                placeholder="Column label (e.g., 'Strongly Agree', 'Score')">
+              <input
+                type="text"
+                [value]="col.colCode"
+                (input)="updateColumn(i, 'colCode', $any($event.target).value)"
+                placeholder="Column code (e.g., 'COL_1')"
+                class="code-input">
+
+              <!-- Dropdown Options -->
+              @if (needsOptions(col)) {
+                <div class="column-options">
+                  <label>Dropdown Options</label>
+                  @if ((col.options || []).length === 0) {
+                    <div class="empty-options-hint">
+                      <span>No options added</span>
+                      <button type="button" (click)="addColumnOption(i)">
+                        <span class="material-icons">add</span>
+                        Add Option
+                      </button>
+                    </div>
+                  } @else {
+                    @for (option of col.options; track option.id; let j = $index) {
+                      <div class="option-row">
+                        <input
+                          type="text"
+                          [value]="option.text"
+                          (input)="updateColumnOption(i, j, 'text', $any($event.target).value)"
+                          placeholder="Option text">
+                        <input
+                          type="text"
+                          [value]="option.value"
+                          (input)="updateColumnOption(i, j, 'value', $any($event.target).value)"
+                          placeholder="Value"
+                          class="value-input">
+                        <button
+                          type="button"
+                          (click)="deleteColumnOption(i, j)"
+                          title="Delete option">
+                          <span class="material-icons">close</span>
+                        </button>
+                      </div>
+                    }
+                    <button type="button" class="add-option-btn" (click)="addColumnOption(i)">
+                      <span class="material-icons">add</span>
+                      Add Option
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+            <button
+              type="button"
+              class="delete-btn"
+              (click)="deleteColumn(i)"
+              title="Delete column">
+              <span class="material-icons">delete_outline</span>
+            </button>
+          </div>
+        }
+
+        @if (columns.length === 0) {
+          <div class="empty-state">
+            <span class="material-icons">view_column</span>
+            <p>No columns added yet</p>
+            <span>Click "Add Column" to get started</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Preview Tab -->
+  @if (activeTab === 'preview') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <div>
+          <h4>Matrix Preview</h4>
+          <p>This is how your matrix will appear to users</p>
+        </div>
+      </div>
+
+      @if (rows.length > 0 && columns.length > 0) {
+        <div class="preview-wrapper">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th class="row-header"></th>
+                @for (col of columns; track col.colId) {
+                  <th>{{ col.colLabel }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows; track row.rowId) {
+                <tr>
+                  <td class="row-label">{{ row.rowLabel }}</td>
+                  @for (col of columns; track col.colId) {
+                    <td class="cell">
+                      @switch (matrixInputType) {
+                        @case ('radio') {
+                          <div class="cell-preview radio"></div>
+                        }
+                        @case ('checkbox') {
+                          <div class="cell-preview checkbox"></div>
+                        }
+                        @case ('text') {
+                          <div class="cell-preview text"></div>
+                        }
+                        @case ('number') {
+                          <div class="cell-preview number">0</div>
+                        }
+                        @case ('dropdown') {
+                          <div class="cell-preview dropdown">▼</div>
+                        }
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="preview-footer">
+            <span class="material-icons">info</span>
+            <span>{{ rows.length }} rows × {{ columns.length }} columns = {{ getCellCount() }} cells</span>
+          </div>
+        </div>
+      } @else {
+        <div class="empty-preview">
+          <span class="material-icons">grid_on</span>
+          <p>Add rows and columns to see preview</p>
+          <span>Rows appear on the left, columns appear across the top</span>
+        </div>
+      }
+    </div>
+  }
+</div>

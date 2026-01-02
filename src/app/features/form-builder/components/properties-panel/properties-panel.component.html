@@ -627,7 +627,7 @@
               <span class="material-icons">grid_on</span>
               <div>
                 <p class="info-title">Matrix Question</p>
-                <p class="info-desc">Configure rows and columns in the Options tab. Each row will display all column options.</p>
+                <p class="info-desc">Configure rows, columns, and input type in the <strong>Options</strong> tab. Choose from radio buttons, checkboxes, text inputs, and more.</p>
               </div>
             </div>
           }
@@ -656,54 +656,65 @@
 
       <!-- Options Tab -->
       @if (activeTab === 'options' && hasOptions()) {
-        <div class="options-section">
-          <div class="options-header">
-            <h4>Answer Options</h4>
-            <button class="add-option-btn" (click)="addOption()" type="button">
-              <span class="material-icons">add</span>
-              Add Option
-            </button>
-          </div>
-
-          @if (options.length === 0) {
-            <div class="empty-options">
-              <p>No options added yet. Click "Add Option" to create choices.</p>
-            </div>
-          } @else {
-            <div class="options-list">
-              @for (option of options; track option.id; let i = $index) {
-                <div class="option-item">
-                  <span class="option-handle material-icons">drag_indicator</span>
-                  <div class="option-fields">
-                    <input 
-                      type="text" 
-                      [value]="option.text"
-                      (input)="updateOption(i, 'text', $any($event.target).value)"
-                      placeholder="Option text">
-                    <input 
-                      type="text" 
-                      [value]="option.value"
-                      (input)="updateOption(i, 'value', $any($event.target).value)"
-                      placeholder="Value"
-                      class="value-input">
-                    <input 
-                      type="number" 
-                      [value]="option.numericScore"
-                      (input)="updateOption(i, 'numericScore', $any($event.target).valueAsNumber)"
-                      placeholder="Score"
-                      class="score-input">
-                  </div>
-                  <button 
-                    class="remove-option-btn" 
-                    (click)="removeOption(i)"
-                    type="button">
-                    <span class="material-icons">close</span>
-                  </button>
-                </div>
-              }
-            </div>
+        <!-- Matrix Question Configuration -->
+        @if (isMatrixType()) {
+          @if (selectedQuestion(); as question) {
+            <app-matrix-editor
+              [question]="question"
+              (questionChange)="onMatrixConfigChange($event)">
+            </app-matrix-editor>
           }
-        </div>
+        } @else {
+          <!-- Standard Options -->
+          <div class="options-section">
+            <div class="options-header">
+              <h4>Answer Options</h4>
+              <button class="add-option-btn" (click)="addOption()" type="button">
+                <span class="material-icons">add</span>
+                Add Option
+              </button>
+            </div>
+
+            @if (options.length === 0) {
+              <div class="empty-options">
+                <p>No options added yet. Click "Add Option" to create choices.</p>
+              </div>
+            } @else {
+              <div class="options-list">
+                @for (option of options; track option.id; let i = $index) {
+                  <div class="option-item">
+                    <span class="option-handle material-icons">drag_indicator</span>
+                    <div class="option-fields">
+                      <input
+                        type="text"
+                        [value]="option.text"
+                        (input)="updateOption(i, 'text', $any($event.target).value)"
+                        placeholder="Option text">
+                      <input
+                        type="text"
+                        [value]="option.value"
+                        (input)="updateOption(i, 'value', $any($event.target).value)"
+                        placeholder="Value"
+                        class="value-input">
+                      <input
+                        type="number"
+                        [value]="option.numericScore"
+                        (input)="updateOption(i, 'numericScore', $any($event.target).valueAsNumber)"
+                        placeholder="Score"
+                        class="score-input">
+                    </div>
+                    <button
+                      class="remove-option-btn"
+                      (click)="removeOption(i)"
+                      type="button">
+                      <span class="material-icons">close</span>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
       }
 
       <!-- Validation Tab -->

@@ -13,6 +13,7 @@ import {
 } from '../../models/form-builder.types';
 import { ConditionalLogicBuilderComponent } from '../conditional-logic-builder/conditional-logic-builder.component';
 import { TableEditorComponent } from '../table-editor/table-editor.component';
+import { MatrixEditorComponent } from '../matrix-editor/matrix-editor.component';
 import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.component';
 import { QuestionType } from '@core/models/form-builder.models';
 
@@ -21,7 +22,7 @@ type PanelTab = 'general' | 'validation' | 'options' | 'logic' | 'advanced';
 @Component({
   selector: 'app-properties-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConditionalLogicBuilderComponent, TableEditorComponent, RichTextEditorComponent],
+  imports: [CommonModule, FormsModule, ConditionalLogicBuilderComponent, TableEditorComponent, MatrixEditorComponent, RichTextEditorComponent],
   templateUrl: './properties-panel.component.html',
   styleUrls: ['./properties-panel.component.scss']
 })
@@ -94,7 +95,9 @@ export class PropertiesPanelComponent {
 
   readonly hasOptions = computed(() => {
     const question = this.selectedQuestion();
-    return question ? questionTypeSupportsOptions(question.questionTypeId) : false;
+    if (!question) return false;
+    // Include Matrix type so Options tab is shown for matrix configuration
+    return questionTypeSupportsOptions(question.questionTypeId) || question.questionTypeId === QuestionType.Matrix;
   });
 
   readonly questionTypeName = computed(() => {
@@ -395,7 +398,15 @@ export class PropertiesPanelComponent {
   onTableConfigChange(updates: Partial<CanvasQuestion>): void {
     const sel = this.selection();
     if (sel.sectionIndex === null || sel.questionIndex === null) return;
-    
+
+    this.store.updateQuestion(sel.sectionIndex, sel.questionIndex, updates);
+  }
+
+  // Matrix Editor Update
+  onMatrixConfigChange(updates: Partial<CanvasQuestion>): void {
+    const sel = this.selection();
+    if (sel.sectionIndex === null || sel.questionIndex === null) return;
+
     this.store.updateQuestion(sel.sectionIndex, sel.questionIndex, updates);
   }
 

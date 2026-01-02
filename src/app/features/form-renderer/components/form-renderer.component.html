@@ -247,22 +247,69 @@
                                 <tr>
                                   <th></th>
                                   @for (col of question.matrixCols; track col.id) {
-                                    <th>{{ col.colText }}</th>
+                                    <th>{{ col.colLabel || col.colText }}</th>
                                   }
                                 </tr>
                               </thead>
                               <tbody>
                                 @for (row of question.matrixRows; track row.id) {
                                   <tr>
-                                    <td class="row-label">{{ row.rowText }}</td>
+                                    <td class="row-label">{{ row.rowLabel || row.rowText }}</td>
                                     @for (col of question.matrixCols; track col.id) {
                                       <td>
-                                        <input
-                                          type="radio"
-                                          [name]="question.id + '_' + row.id"
-                                          (change)="updateMatrixAnswer(question.id, row.id, col.id, 'selected')"
-                                          [checked]="getMatrixAnswer(question.id, row.id, col.id) === 'selected'"
-                                        />
+                                        @switch (col.inputType || 'radio') {
+                                          @case ('radio') {
+                                            <input
+                                              type="radio"
+                                              [name]="question.id + '_' + row.id"
+                                              [value]="col.id"
+                                              (change)="updateMatrixAnswer(question.id, row.id, col.id, 'selected')"
+                                              [checked]="getMatrixAnswer(question.id, row.id, col.id) === 'selected'"
+                                            />
+                                          }
+                                          @case ('checkbox') {
+                                            <input
+                                              type="checkbox"
+                                              [name]="question.id + '_' + row.id + '_' + col.id"
+                                              (change)="updateMatrixAnswer(question.id, row.id, col.id, $any($event.target).checked ? 'checked' : '')"
+                                              [checked]="getMatrixAnswer(question.id, row.id, col.id) === 'checked'"
+                                            />
+                                          }
+                                          @case ('text') {
+                                            <input
+                                              type="text"
+                                              [name]="question.id + '_' + row.id + '_' + col.id"
+                                              [value]="getMatrixAnswer(question.id, row.id, col.id) || ''"
+                                              (input)="updateMatrixAnswer(question.id, row.id, col.id, $any($event.target).value)"
+                                              class="matrix-text-input"
+                                            />
+                                          }
+                                          @case ('number') {
+                                            <input
+                                              type="number"
+                                              [name]="question.id + '_' + row.id + '_' + col.id"
+                                              [value]="getMatrixAnswer(question.id, row.id, col.id) || ''"
+                                              (input)="updateMatrixAnswer(question.id, row.id, col.id, $any($event.target).value)"
+                                              class="matrix-number-input"
+                                            />
+                                          }
+                                          @case ('dropdown') {
+                                            <select
+                                              [name]="question.id + '_' + row.id + '_' + col.id"
+                                              [value]="getMatrixAnswer(question.id, row.id, col.id) || ''"
+                                              (change)="updateMatrixAnswer(question.id, row.id, col.id, $any($event.target).value)"
+                                              class="matrix-dropdown">
+                                              <option value="">Select...</option>
+                                              @if (col.options) {
+                                                @for (option of col.options; track option.id) {
+                                                  <option [value]="option.optionValue || option.value">
+                                                    {{ option.optionText || option.text }}
+                                                  </option>
+                                                }
+                                              }
+                                            </select>
+                                          }
+                                        }
                                       </td>
                                     }
                                   </tr>

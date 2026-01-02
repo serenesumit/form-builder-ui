@@ -33,12 +33,18 @@ interface QuestionOption {
 
 interface MatrixRow {
   id: number;
-  rowText: string;
+  rowText?: string;
+  rowLabel?: string;
+  rowCode?: string;
 }
 
 interface MatrixCol {
   id: number;
-  colText: string;
+  colText?: string;
+  colLabel?: string;
+  colCode?: string;
+  inputType?: 'radio' | 'checkbox' | 'text' | 'number' | 'dropdown';
+  options?: QuestionOption[];
 }
 
 interface ConditionalRule {
