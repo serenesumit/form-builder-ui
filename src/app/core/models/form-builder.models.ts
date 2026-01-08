@@ -374,3 +374,63 @@ export interface Result<T> {
   value?: T;
   error?: string;
 }
+
+// ============================================
+// Form Response Models (for filling forms)
+// ============================================
+
+/**
+ * Request to save a single form response answer
+ */
+export interface SaveResponseAnswerRequest {
+  questionId: string;
+  answerValue?: string;
+  optionId?: string;
+  repeatIndex?: number;
+  matrixRowId?: number;
+  matrixColId?: number;
+}
+
+/**
+ * Request to save all form responses in bulk
+ */
+export interface SaveAllFormResponsesRequest {
+  responseId?: string;
+  patientId: number;
+  versionId: string;
+  assignmentId?: string;
+  admissionId?: number;
+  answers: SaveResponseAnswerRequest[];
+  autoComplete?: boolean;
+  completedBy?: string;
+}
+
+/**
+ * Response from saving form responses
+ */
+export interface SaveAllFormResponsesResult {
+  responseId: string;
+  completionPercentage: number;
+  isComplete: boolean;
+  validationErrors?: ValidationError[];
+}
+
+/**
+ * Validation error from form response save
+ */
+export interface ValidationError {
+  questionId: string;
+  errorMessage: string;
+}
+
+/**
+ * Form answer for display/editing
+ */
+export interface FormAnswer {
+  questionId: string;
+  answerValue?: string;
+  optionId?: string;
+  repeatIndex?: number;
+  matrixRowId?: number;
+  matrixColId?: number;
+}

@@ -51,11 +51,18 @@
         <e-column field="modifiedDate" headerText="Modified" width="120" type="date" format="yMd"></e-column>
         <e-column
           headerText="Actions"
-          width="150"
+          width="200"
           [allowSorting]="false"
           [allowFiltering]="false">
           <ng-template #template let-data>
             <div class="action-buttons" (click)="$event.stopPropagation()">
+              <button
+                ejs-button
+                (click)="onFill(data.definitionId); $event.stopPropagation()"
+                cssClass="e-small e-primary"
+                iconCss="e-icons e-edit-2"
+                title="Fill Form">
+              </button>
               <button
                 ejs-button
                 (click)="onView(data.definitionId); $event.stopPropagation()"

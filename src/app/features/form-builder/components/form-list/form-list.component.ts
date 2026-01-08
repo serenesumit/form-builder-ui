@@ -36,7 +36,7 @@ export class FormListComponent implements OnInit {
     this.error.set(null);
 
     this.apiService.getAllForms().pipe(
-      timeout(10000), // 10 second timeout
+      timeout(100000), // 100 second timeout
       catchError((error) => {
         const errorMessage = error.name === 'TimeoutError'
           ? 'Request timed out. Please check if the API server is running.'
@@ -62,6 +62,10 @@ export class FormListComponent implements OnInit {
 
   onView(definitionId: string): void {
     this.router.navigate(['/forms/preview', definitionId]);
+  }
+
+  onFill(definitionId: string): void {
+    this.router.navigate(['/forms/fill', definitionId]);
   }
 
   onDelete(definitionId: string): void {

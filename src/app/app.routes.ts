@@ -71,6 +71,20 @@ export const routes: Routes = [
           import('./features/form-builder/pages/form-preview-page/form-preview-page.component').then(
             m => m.FormPreviewPageComponent
           )
+      },
+      {
+        path: 'fill/:id',
+        loadComponent: () =>
+          import('./features/form-builder/pages/form-fill-page/form-fill-page.component').then(
+            m => m.FormFillPageComponent
+          )
+      },
+      {
+        path: 'fill/version/:versionId',
+        loadComponent: () =>
+          import('./features/form-builder/pages/form-fill-page/form-fill-page.component').then(
+            m => m.FormFillPageComponent
+          )
       }
     ]
   },

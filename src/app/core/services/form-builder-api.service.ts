@@ -8,7 +8,9 @@ import {
   FormBuilderDto,
   FormListItemDto,
   FormVersionDto,
-  ApiError
+  ApiError,
+  SaveAllFormResponsesRequest,
+  SaveAllFormResponsesResult
 } from '../models/form-builder.models';
 
 @Injectable({
@@ -17,6 +19,7 @@ import {
 export class FormBuilderApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/tenants/${environment.tenantId}/form-builder`;
+  private readonly responsesUrl = `${environment.apiUrl}/tenants/${environment.tenantId}/form-responses`;
 
   /**
    * Retrieves all forms for the tenant
@@ -64,6 +67,19 @@ export class FormBuilderApiService {
    */
   getFormVersions(definitionId: string): Observable<FormVersionDto[]> {
     return this.http.get<FormVersionDto[]>(`${this.baseUrl}/${definitionId}/versions`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // ============================================
+  // Form Response Methods
+  // ============================================
+
+  /**
+   * Save all form responses in bulk
+   * Validates all answers, calculates completion percentage, and optionally auto-completes the form
+   */
+  saveAllFormResponses(request: SaveAllFormResponsesRequest): Observable<SaveAllFormResponsesResult> {
+    return this.http.post<SaveAllFormResponsesResult>(`${this.responsesUrl}/bulk`, request)
       .pipe(catchError(this.handleError));
   }
 

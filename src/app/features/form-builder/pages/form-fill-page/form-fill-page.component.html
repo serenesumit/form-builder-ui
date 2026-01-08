@@ -1,0 +1,345 @@
+<div class="form-fill-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button 
+        ejs-button 
+        (click)="handleBackClick()" 
+        cssClass="e-outline back-btn"
+        iconCss="e-icons e-arrow-left">
+        Back to Forms
+      </button>
+      <div class="form-title-section">
+        <h1>{{ formName() }}</h1>
+        @if (formDefinition()?.description) {
+          <p class="form-description">{{ formDefinition()?.description }}</p>
+        }
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="completion-info">
+        <div class="completion-bar">
+          <div class="completion-fill" [style.width.%]="calculatedCompletion()"></div>
+        </div>
+        <span class="completion-text">{{ calculatedCompletion() }}% Complete ({{ answeredQuestions() }}/{{ totalQuestions() }})</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-container">
+      <div class="error-icon">⚠️</div>
+      <h2>Unable to Load Form</h2>
+      <p>{{ error() }}</p>
+      <button ejs-button (click)="handleRetry()" cssClass="e-primary">
+        Try Again
+      </button>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading form...</p>
+    </div>
+  }
+
+  <!-- Save Error -->
+  @if (saveError()) {
+    <div class="save-error-banner">
+      <span class="error-icon">❌</span>
+      <span>{{ saveError() }}</span>
+      <button (click)="saveError.set(null)" class="close-btn">×</button>
+    </div>
+  }
+
+  <!-- Form Content -->
+  @if (!isLoading() && !error() && formDefinition()) {
+    <div class="form-content">
+      @for (section of sections(); track section.sectionId; let sectionIndex = $index) {
+        <div class="form-section" [class.collapsible]="section.isCollapsible">
+          <div class="section-header">
+            <h2 class="section-title">{{ section.sectionName }}</h2>
+            @if (section.sectionDescription) {
+              <p class="section-description">{{ section.sectionDescription }}</p>
+            }
+          </div>
+
+          <div class="section-questions">
+            @for (question of section.questions; track question.questionId; let questionIndex = $index) {
+              <div class="question-card" 
+                   [class.has-error]="getValidationError(question.questionId)"
+                   [style.background-color]="question.backgroundColor || ''"
+                   [style.border-left-color]="question.borderColor || ''">
+                
+                <!-- Question Label -->
+                <div class="question-header">
+                  <label class="question-label" [attr.for]="question.questionId">
+                    {{ question.questionText }}
+                    @if (question.isRequired) {
+                      <span class="required-marker">*</span>
+                    }
+                  </label>
+                  @if (question.helpText) {
+                    <p class="help-text">{{ question.helpText }}</p>
+                  }
+                </div>
+
+                <!-- Question Input -->
+                <div class="question-input">
+                  <!-- Text Input -->
+                  @if (question.questionTypeId === QuestionType.Text) {
+                    <ejs-textbox
+                      [id]="question.questionId"
+                      [placeholder]="question.placeholderText || 'Enter your answer...'"
+                      [value]="getAnswerValue(question.questionId)"
+                      (input)="setAnswerValue(question.questionId, $any($event.target).value)"
+                      floatLabelType="Never"
+                      cssClass="custom-input">
+                    </ejs-textbox>
+                  }
+
+                  <!-- TextArea -->
+                  @if (question.questionTypeId === QuestionType.TextArea) {
+                    <ejs-textbox
+                      [id]="question.questionId"
+                      [placeholder]="question.placeholderText || 'Enter your answer...'"
+                      [value]="getAnswerValue(question.questionId)"
+                      (input)="setAnswerValue(question.questionId, $any($event.target).value)"
+                      [multiline]="true"
+                      floatLabelType="Never"
+                      cssClass="custom-textarea">
+                    </ejs-textbox>
+                  }
+
+                  <!-- Number -->
+                  @if (question.questionTypeId === QuestionType.Number) {
+                    <ejs-numerictextbox
+                      [id]="question.questionId"
+                      [placeholder]="question.placeholderText || 'Enter a number...'"
+                      [min]="question.minValue ?? undefined"
+                      [max]="question.maxValue ?? undefined"
+                      [value]="getAnswerValue(question.questionId) ? +getAnswerValue(question.questionId) : null"
+                      (change)="setAnswerValue(question.questionId, $event.value)"
+                      floatLabelType="Never"
+                      cssClass="custom-input">
+                    </ejs-numerictextbox>
+                  }
+
+                  <!-- Yes/No -->
+                  @if (question.questionTypeId === QuestionType.YesNo) {
+                    <div class="yesno-group">
+                      <button 
+                        type="button"
+                        class="yesno-btn"
+                        [class.selected]="getAnswerValue(question.questionId) === 'true'"
+                        (click)="setAnswerValue(question.questionId, 'true')">
+                        <span class="yesno-icon">✓</span> Yes
+                      </button>
+                      <button 
+                        type="button"
+                        class="yesno-btn"
+                        [class.selected]="getAnswerValue(question.questionId) === 'false'"
+                        (click)="setAnswerValue(question.questionId, 'false')">
+                        <span class="yesno-icon">✗</span> No
+                      </button>
+                    </div>
+                  }
+
+                  <!-- Radio Button / Multiple Choice -->
+                  @if (question.questionTypeId === QuestionType.RadioButton || question.questionTypeId === QuestionType.MultipleChoice) {
+                    <div class="radio-group">
+                      @for (option of question.options; track option.optionId) {
+                        <label class="radio-option" [class.selected]="getAnswerValue(question.questionId) === (option.optionValue || option.optionText)">
+                          <input 
+                            type="radio"
+                            [name]="question.questionId"
+                            [value]="option.optionValue || option.optionText"
+                            [checked]="getAnswerValue(question.questionId) === (option.optionValue || option.optionText)"
+                            (change)="setAnswerValue(question.questionId, option.optionValue || option.optionText, option.optionId)">
+                          <span class="radio-checkmark"></span>
+                          <span class="option-text">{{ option.optionText }}</span>
+                        </label>
+                      }
+                    </div>
+                  }
+
+                  <!-- Checkbox (Multiple Selection) -->
+                  @if (question.questionTypeId === QuestionType.Checkbox) {
+                    <div class="checkbox-group">
+                      @for (option of question.options; track option.optionId) {
+                        <label class="checkbox-option" [class.selected]="isCheckboxSelected(question.questionId, option.optionValue || option.optionText)">
+                          <input 
+                            type="checkbox"
+                            [value]="option.optionValue || option.optionText"
+                            [checked]="isCheckboxSelected(question.questionId, option.optionValue || option.optionText)"
+                            (change)="toggleCheckboxValue(question.questionId, option.optionValue || option.optionText, $any($event.target).checked)">
+                          <span class="checkbox-checkmark"></span>
+                          <span class="option-text">{{ option.optionText }}</span>
+                        </label>
+                      }
+                    </div>
+                  }
+
+                  <!-- Dropdown -->
+                  @if (question.questionTypeId === QuestionType.Dropdown) {
+                    <ejs-dropdownlist
+                      [id]="question.questionId"
+                      [dataSource]="question.options"
+                      [fields]="getDropdownFields()"
+                      [placeholder]="question.placeholderText || 'Select an option...'"
+                      [value]="getAnswerValue(question.questionId)"
+                      (change)="setAnswerValue(question.questionId, $event.value)"
+                      floatLabelType="Never"
+                      cssClass="custom-dropdown">
+                    </ejs-dropdownlist>
+                  }
+
+                  <!-- Date -->
+                  @if (question.questionTypeId === QuestionType.Date) {
+                    <ejs-datepicker
+                      [id]="question.questionId"
+                      [placeholder]="question.placeholderText || 'Select date...'"
+                      [value]="getAnswerValue(question.questionId)"
+                      (change)="setAnswerValue(question.questionId, $event.value)"
+                      floatLabelType="Never"
+                      format="MM/dd/yyyy"
+                      cssClass="custom-datepicker">
+                    </ejs-datepicker>
+                  }
+
+                  <!-- Time -->
+                  @if (question.questionTypeId === QuestionType.Time) {
+                    <ejs-timepicker
+                      [id]="question.questionId"
+                      [placeholder]="question.placeholderText || 'Select time...'"
+                      [value]="getAnswerValue(question.questionId)"
+                      (change)="setAnswerValue(question.questionId, $event.value)"
+                      floatLabelType="Never"
+                      cssClass="custom-timepicker">
+                    </ejs-timepicker>
+                  }
+
+                  <!-- DateTime -->
+                  @if (question.questionTypeId === QuestionType.DateTime) {
+                    <ejs-datetimepicker
+                      [id]="question.questionId"
+                      [placeholder]="question.placeholderText || 'Select date and time...'"
+                      [value]="getAnswerValue(question.questionId)"
+                      (change)="setAnswerValue(question.questionId, $event.value)"
+                      floatLabelType="Never"
+                      cssClass="custom-datetimepicker">
+                    </ejs-datetimepicker>
+                  }
+
+                  <!-- Scale/Rating -->
+                  @if (question.questionTypeId === QuestionType.Scale) {
+                    <div class="scale-group">
+                      @for (num of getScaleOptions(question); track num) {
+                        <button 
+                          type="button"
+                          class="scale-option"
+                          [class.selected]="getAnswerValue(question.questionId) === num.toString()"
+                          (click)="setAnswerValue(question.questionId, num.toString())">
+                          {{ num }}
+                        </button>
+                      }
+                    </div>
+                  }
+
+                  <!-- Slider -->
+                  @if (question.questionTypeId === QuestionType.Slider) {
+                    <div class="slider-container">
+                      <ejs-slider
+                        [id]="question.questionId"
+                        [min]="question.minValue ?? 0"
+                        [max]="question.maxValue ?? 100"
+                        [value]="getAnswerValue(question.questionId) ? +getAnswerValue(question.questionId) : (question.minValue ?? 0)"
+                        (change)="setAnswerValue(question.questionId, $event.value)"
+                        [showButtons]="true"
+                        [tooltip]="{isVisible: true, placement: 'Before', showOn: 'Always'}">
+                      </ejs-slider>
+                      <div class="slider-labels">
+                        <span>{{ question.minValue ?? 0 }}</span>
+                        <span>{{ question.maxValue ?? 100 }}</span>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Display/Rich Text (Read-only) -->
+                  @if (question.questionTypeId === QuestionType.Display || question.questionTypeId === QuestionType.RichTextBlock) {
+                    <div class="display-content" [innerHTML]="question.defaultValue || ''"></div>
+                  }
+                </div>
+
+                <!-- Validation Error -->
+                @if (getValidationError(question.questionId)) {
+                  <div class="validation-error">
+                    <span class="error-icon">⚠</span>
+                    {{ getValidationError(question.questionId) }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          ejs-button 
+          (click)="handleBackClick()" 
+          cssClass="e-outline action-btn">
+          Cancel
+        </button>
+        <div class="action-buttons-right">
+          <button 
+            ejs-button 
+            (click)="saveForm(false)" 
+            [disabled]="isSaving()"
+            cssClass="e-outline action-btn save-draft-btn">
+            @if (isSaving()) {
+              <span class="btn-spinner"></span>
+            }
+            Save as Draft
+          </button>
+          <button 
+            ejs-button 
+            (click)="saveForm(true)" 
+            [disabled]="isSaving()"
+            cssClass="e-primary action-btn submit-btn">
+            @if (isSaving()) {
+              <span class="btn-spinner"></span>
+            }
+            Submit Form
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Success Dialog -->
+  @if (showSuccessDialog()) {
+    <div class="success-overlay" (click)="closeSuccessDialog()">
+      <div class="success-dialog" (click)="$event.stopPropagation()">
+        <div class="success-icon">✓</div>
+        <h2>Form Saved Successfully!</h2>
+        <p>Your responses have been saved.</p>
+        @if (completionPercentage() > 0) {
+          <p class="completion-info-dialog">Completion: {{ completionPercentage() }}%</p>
+        }
+        <div class="dialog-actions">
+          <button ejs-button (click)="closeSuccessDialog()" cssClass="e-outline">
+            Continue Editing
+          </button>
+          <button ejs-button (click)="navigateToFormsList()" cssClass="e-primary">
+            Back to Forms
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
