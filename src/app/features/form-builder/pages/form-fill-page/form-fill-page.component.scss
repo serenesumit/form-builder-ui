@@ -257,6 +257,41 @@
 // Input Styles
 // ============================================
 .question-input {
+  // Native text input styles
+  .form-text-input,
+  .form-textarea-input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #1e293b;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:hover {
+      border-color: #cbd5e1;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+  }
+
+  .form-textarea-input {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
   :host ::ng-deep {
     .custom-input,
     .custom-textarea,

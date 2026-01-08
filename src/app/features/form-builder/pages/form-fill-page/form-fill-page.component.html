@@ -91,27 +91,25 @@
                 <div class="question-input">
                   <!-- Text Input -->
                   @if (question.questionTypeId === QuestionType.Text) {
-                    <ejs-textbox
+                    <input
+                      type="text"
+                      class="form-text-input"
                       [id]="question.questionId"
                       [placeholder]="question.placeholderText || 'Enter your answer...'"
                       [value]="getAnswerValue(question.questionId)"
-                      (input)="setAnswerValue(question.questionId, $any($event.target).value)"
-                      floatLabelType="Never"
-                      cssClass="custom-input">
-                    </ejs-textbox>
+                      (input)="setAnswerValue(question.questionId, $any($event.target).value)">
                   }
 
                   <!-- TextArea -->
                   @if (question.questionTypeId === QuestionType.TextArea) {
-                    <ejs-textbox
+                    <textarea
+                      class="form-textarea-input"
                       [id]="question.questionId"
                       [placeholder]="question.placeholderText || 'Enter your answer...'"
                       [value]="getAnswerValue(question.questionId)"
                       (input)="setAnswerValue(question.questionId, $any($event.target).value)"
-                      [multiline]="true"
-                      floatLabelType="Never"
-                      cssClass="custom-textarea">
-                    </ejs-textbox>
+                      rows="4">
+                    </textarea>
                   }
 
                   <!-- Number -->
