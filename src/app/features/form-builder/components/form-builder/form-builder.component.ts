@@ -7,7 +7,7 @@ import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { FormBuilderStoreService } from '../../services/form-builder-store.service';
 import { FormBuilderApiService } from '@core/services/form-builder-api.service';
-import { FormVersionDto } from '@core/models/form-builder.models';
+import { FormVersionDto, QuestionType } from '@core/models/form-builder.models';
 import { ComponentPaletteComponent } from '../component-palette/component-palette.component';
 import { FormCanvasComponent } from '../form-canvas/form-canvas.component';
 import { PropertiesPanelComponent } from '../properties-panel/properties-panel.component';
@@ -193,6 +193,13 @@ export class FormBuilderComponent implements OnInit {
       return;
     }
 
+    const calculatedQuestionError = this.validateCalculatedQuestions();
+    if (calculatedQuestionError) {
+      this.store.setError(calculatedQuestionError);
+      alert(calculatedQuestionError);
+      return;
+    }
+
     this.store.setSaving(true);
     
     const request = this.store.toSaveFormRequest();
@@ -216,6 +223,26 @@ export class FormBuilderComponent implements OnInit {
         alert(`Error saving form: ${error.message}`);
       }
     });
+  }
+
+  private validateCalculatedQuestions(): string | null {
+    for (const section of this.store.sections()) {
+      for (const question of section.questions) {
+        const requiresFormula = question.questionTypeId === QuestionType.Calculated;
+
+        if (!requiresFormula || question.calculationFormula?.trim()) {
+          continue;
+        }
+
+        if (question.conditionalRules.length > 0) {
+          return `Question "${question.questionText}" in section "${section.name}" is using the Calculated type without a formula. If this should only appear conditionally, change the question type to Display Text.`;
+        }
+
+        return `Question "${question.questionText}" in section "${section.name}" is missing a calculation formula.`;
+      }
+    }
+
+    return null;
   }
 
   onPreview(): void {

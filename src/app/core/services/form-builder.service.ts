@@ -9,7 +9,8 @@ import {
   FormBuilderSectionRequest,
   FormQuestionRequest,
   QUESTION_TYPES,
-  QuestionTypeInfo
+  QuestionTypeInfo,
+  QuestionType
 } from '../models/form-builder.models';
 
 export interface FormBuilderState {
@@ -105,11 +106,13 @@ export class FormBuilderService {
       return;
     }
 
+    const normalizedForm = this.normalizeForm(form);
+
     this.state.update(state => ({ ...state, isLoading: true, error: null }));
 
     const saveObservable = definitionId
-      ? this.apiService.updateForm(definitionId, form)
-      : this.apiService.createForm(form);
+      ? this.apiService.updateForm(definitionId, normalizedForm)
+      : this.apiService.createForm(normalizedForm);
 
     saveObservable.subscribe({
       next: (result: SaveFormResult) => {
@@ -246,7 +249,7 @@ export class FormBuilderService {
     const updatedSections = [...form.sections];
     updatedSections[sectionIndex] = {
       ...section,
-      questions: [...section.questions, newQuestion]
+      questions: [...section.questions, this.normalizeQuestion(newQuestion)]
     };
 
     this.state.update(state => ({
@@ -273,10 +276,10 @@ export class FormBuilderService {
     if (questionIndex < 0 || questionIndex >= section.questions.length) return;
 
     const updatedQuestions = [...section.questions];
-    updatedQuestions[questionIndex] = {
+    updatedQuestions[questionIndex] = this.normalizeQuestion({
       ...updatedQuestions[questionIndex],
       ...updates
-    };
+    });
 
     const updatedSections = [...form.sections];
     updatedSections[sectionIndex] = {
@@ -357,7 +360,7 @@ export class FormBuilderService {
    */
   private convertDtoToRequest(dto: FormBuilderDto): SaveFormRequest {
     // Helper function to convert a single question
-    const convertQuestion = (q: any, qIndex: number): FormQuestionRequest => ({
+    const convertQuestion = (q: any, qIndex: number): FormQuestionRequest => this.normalizeQuestion({
       questionId: q.questionId,
       questionCode: q.questionCode,
       questionText: q.questionText,
@@ -376,8 +379,8 @@ export class FormBuilderService {
       cptCode: q.cptCode,
       loincCode: q.loincCode,
       snomedCode: q.snomedCode,
-      isCalculated: q.isCalculated ?? false,
-      calculationFormula: q.calculationExpression,
+      isCalculated: q.questionTypeId === QuestionType.Calculated,
+      calculationFormula: q.calculationExpression || '',
       minValue: q.minValue ?? null,
       maxValue: q.maxValue ?? null,
       minLength: q.minLength ?? null,
@@ -454,6 +457,27 @@ export class FormBuilderService {
       allowVersioning: true,
       changeNotes: '',
       sections
+    };
+  }
+
+  private normalizeForm(form: SaveFormRequest): SaveFormRequest {
+    return {
+      ...form,
+      sections: form.sections.map(section => ({
+        ...section,
+        questions: section.questions.map(question => this.normalizeQuestion(question))
+      }))
+    };
+  }
+
+  private normalizeQuestion(question: FormQuestionRequest): FormQuestionRequest {
+    const isCalculatedType = question.questionTypeId === QuestionType.Calculated;
+
+    return {
+      ...question,
+      isCalculated: isCalculatedType,
+      calculationFormula: isCalculatedType ? (question.calculationFormula || '') : '',
+      defaultValue: isCalculatedType ? '' : (question.defaultValue || '')
     };
   }
 }

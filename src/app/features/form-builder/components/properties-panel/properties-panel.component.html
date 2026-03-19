@@ -836,29 +836,13 @@
 
         <div class="form-divider"></div>
 
-        <div class="toggle-group">
-          <label class="toggle-label">
-            <input 
-              type="checkbox" 
-              [checked]="selectedQuestion()?.isCalculated || false"
-              (change)="updateQuestionField('isCalculated', $any($event.target).checked)">
-            <span class="toggle-text">
-              <span class="toggle-title">Calculated Field</span>
-              <span class="toggle-desc">Value computed from other fields</span>
-            </span>
-          </label>
-        </div>
-
-        @if (selectedQuestion()?.isCalculated) {
-          <div class="form-group">
-            <label for="formula">Calculation Formula</label>
-            <textarea 
-              id="formula"
-              [value]="selectedQuestion()?.calculationFormula || ''"
-              (input)="updateQuestionField('calculationFormula', $any($event.target).value)"
-              placeholder="e.g., Q1 + Q2 + Q3"
-              rows="3"></textarea>
-            <span class="field-hint">Reference other questions by their code</span>
+        @if (isCalculatedType()) {
+          <div class="info-box info">
+            <span class="material-icons">calculate</span>
+            <div>
+              <p class="info-title">Calculated Field</p>
+              <p class="info-desc">This question is calculated because its type is <strong>Calculated</strong>. Configure the formula in the <strong>General</strong> tab.</p>
+            </div>
           </div>
         }
       }

@@ -27,7 +27,8 @@ import {
   FormBuilderMatrixColRequest,
   FormBuilderDto,
   FormBuilderSectionDto,
-  FormBuilderQuestionDto
+  FormBuilderQuestionDto,
+  QuestionType
 } from '@core/models/form-builder.models';
 
 const initialState: FormBuilderStoreState = {
@@ -170,7 +171,7 @@ export class FormBuilderStoreService {
   }
 
   private convertApiQuestionToCanvas(apiQuestion: FormBuilderQuestionDto, index: number): CanvasQuestion {
-    return {
+    return this.normalizeQuestion({
       id: apiQuestion.questionId || generateId(),
       questionCode: apiQuestion.questionCode || '',
       questionText: apiQuestion.questionText,
@@ -188,8 +189,8 @@ export class FormBuilderStoreService {
       cptCode: apiQuestion.cptCode,
       loincCode: apiQuestion.loincCode,
       snomedCode: apiQuestion.snomedCode,
-      isCalculated: apiQuestion.isCalculated || false,
-      calculationFormula: apiQuestion.calculationExpression,
+      isCalculated: apiQuestion.questionTypeId === QuestionType.Calculated,
+      calculationFormula: apiQuestion.calculationExpression || '',
       minValue: apiQuestion.minValue ?? undefined,
       maxValue: apiQuestion.maxValue ?? undefined,
       minLength: apiQuestion.minLength ?? undefined,
@@ -228,7 +229,7 @@ export class FormBuilderStoreService {
         sortOrder: col.sortOrder ?? colIndex,
         inputType: (col.inputType as any) || 'text'
       })) || []
-    };
+    });
   }
 
   resetState(): void {
@@ -386,7 +387,10 @@ export class FormBuilderStoreService {
       const questions = [...sections[sectionIndex].questions];
       if (questionIndex < 0 || questionIndex >= questions.length) return state;
       
-      questions[questionIndex] = { ...questions[questionIndex], ...updates };
+      questions[questionIndex] = this.normalizeQuestion({
+        ...questions[questionIndex],
+        ...updates
+      });
       sections[sectionIndex] = { ...sections[sectionIndex], questions };
       
       return { ...state, sections, isDirty: true };
@@ -693,37 +697,39 @@ export class FormBuilderStoreService {
   }
 
   private convertQuestion(question: CanvasQuestion, index: number): FormQuestionRequest {
+    const normalizedQuestion = this.normalizeQuestion(question);
+
     return {
-      questionId: question.id,  // Send as-is - backend matches existing or creates new
-      questionCode: question.questionCode,
-      questionText: question.questionText,
-      questionTypeId: question.questionTypeId,
-      helpText: question.helpText,
-      isRequired: question.isRequired,
+      questionId: normalizedQuestion.id,  // Send as-is - backend matches existing or creates new
+      questionCode: normalizedQuestion.questionCode,
+      questionText: normalizedQuestion.questionText,
+      questionTypeId: normalizedQuestion.questionTypeId,
+      helpText: normalizedQuestion.helpText,
+      isRequired: normalizedQuestion.isRequired,
       displayOrder: index,
-      isActive: question.isActive,
-      backgroundColor: question.backgroundColor,
-      borderColor: question.borderColor,
+      isActive: normalizedQuestion.isActive,
+      backgroundColor: normalizedQuestion.backgroundColor,
+      borderColor: normalizedQuestion.borderColor,
       height: null,
-      placeholderText: question.placeholderText,
-      defaultValue: question.defaultValue,
-      isPhi: question.isPhi,
-      cptCode: question.cptCode,
-      loincCode: question.loincCode,
-      snomedCode: question.snomedCode,
-      isCalculated: question.isCalculated,
-      calculationFormula: question.calculationFormula,
-      minValue: question.minValue ?? null,
-      maxValue: question.maxValue ?? null,
-      minLength: question.minLength ?? null,
-      maxLength: question.maxLength ?? null,
-      regexPattern: question.regexPattern,
-      regexErrorMessage: question.regexErrorMessage,
-      options: question.options.map((opt, i) => this.convertOption(opt, i)),
-      conditionalRules: question.conditionalRules.map((rule, i) => this.convertConditionalRule(rule, i)),
+      placeholderText: normalizedQuestion.placeholderText,
+      defaultValue: normalizedQuestion.defaultValue,
+      isPhi: normalizedQuestion.isPhi,
+      cptCode: normalizedQuestion.cptCode,
+      loincCode: normalizedQuestion.loincCode,
+      snomedCode: normalizedQuestion.snomedCode,
+      isCalculated: normalizedQuestion.isCalculated,
+      calculationFormula: normalizedQuestion.calculationFormula,
+      minValue: normalizedQuestion.minValue ?? null,
+      maxValue: normalizedQuestion.maxValue ?? null,
+      minLength: normalizedQuestion.minLength ?? null,
+      maxLength: normalizedQuestion.maxLength ?? null,
+      regexPattern: normalizedQuestion.regexPattern,
+      regexErrorMessage: normalizedQuestion.regexErrorMessage,
+      options: normalizedQuestion.options.map((opt, i) => this.convertOption(opt, i)),
+      conditionalRules: normalizedQuestion.conditionalRules.map((rule, i) => this.convertConditionalRule(rule, i)),
       validationRules: [], // TODO: Implement when validation rules UI is added
-      rows: (question.rows || []).map((row, i) => this.convertTableRow(row, i)),
-      cols: (question.cols || []).map((col, i) => this.convertTableCol(col, i))
+      rows: (normalizedQuestion.rows || []).map((row, i) => this.convertTableRow(row, i)),
+      cols: (normalizedQuestion.cols || []).map((col, i) => this.convertTableCol(col, i))
     };
   }
 
@@ -782,6 +788,17 @@ export class FormBuilderStoreService {
     if (questionIndex < 0 || questionIndex >= questions.length) return null;
     
     return questions[questionIndex];
+  }
+
+  private normalizeQuestion(question: CanvasQuestion): CanvasQuestion {
+    const isCalculatedType = question.questionTypeId === QuestionType.Calculated;
+
+    return {
+      ...question,
+      isCalculated: isCalculatedType,
+      calculationFormula: isCalculatedType ? (question.calculationFormula || '') : '',
+      defaultValue: isCalculatedType ? '' : question.defaultValue
+    };
   }
 }
 
